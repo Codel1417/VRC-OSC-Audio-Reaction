@@ -31,18 +31,18 @@ while (true)
             float rightEarIncomingVolume = device.AudioMeterInformation.PeakValues[1];
             float masterIncomingVolume = device.AudioMeterInformation.MasterPeakValue;
         
-            leftEarSmoothedVolume = Helpers.Lerp(leftEarSmoothedVolume, leftEarIncomingVolume, 0.1f);
-            rightEarSmoothedVolume = Helpers.Lerp(rightEarSmoothedVolume, rightEarIncomingVolume, 0.1f);
-            masterSmoothedVolume = Helpers.Lerp(masterSmoothedVolume, masterIncomingVolume, 0.1f);
+            leftEarSmoothedVolume = Helpers.Lerp(leftEarSmoothedVolume, leftEarIncomingVolume, 0.05f);
+            rightEarSmoothedVolume = Helpers.Lerp(rightEarSmoothedVolume, rightEarIncomingVolume, 0.05f);
+            masterSmoothedVolume = Helpers.Lerp(masterSmoothedVolume, masterIncomingVolume, 0.05f);
             
             if (config.Parameters.ContainsKey(audioDirectionParameter))
             {
                 float direction = Math.Clamp(-leftEarSmoothedVolume + rightEarSmoothedVolume + 0.5f , 0, 1);
-                OscParameter.SendAvatarParameter(audioDirectionParameter, direction);
+                OscParameter.SendValue("/avatar/parameters/" + audioDirectionParameter, direction);
             }
             if (config.Parameters.ContainsKey(audioVolumeParameter))
             {
-                OscParameter.SendAvatarParameter(audioVolumeParameter, masterSmoothedVolume);
+                OscParameter.SendValue("/avatar/parameters/" + audioVolumeParameter, masterSmoothedVolume);
             }
         
         }
@@ -50,7 +50,12 @@ while (true)
         {
             device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
             Console.Write("Device: " + device.FriendlyName);
+            await Task.Delay(1000);
         }
+    }
+    else
+    {
+        await Task.Delay(1000);
     }
     await Task.Delay(10);
 }
