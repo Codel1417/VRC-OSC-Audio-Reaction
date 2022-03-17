@@ -31,9 +31,9 @@ while (true)
             float rightEarIncomingVolume = device.AudioMeterInformation.PeakValues[1];
             float masterIncomingVolume = device.AudioMeterInformation.MasterPeakValue;
         
-            leftEarSmoothedVolume = Helpers.Lerp(leftEarSmoothedVolume, leftEarIncomingVolume, 0.05f);
-            rightEarSmoothedVolume = Helpers.Lerp(rightEarSmoothedVolume, rightEarIncomingVolume, 0.05f);
-            masterSmoothedVolume = Helpers.Lerp(masterSmoothedVolume, masterIncomingVolume, 0.05f);
+            leftEarSmoothedVolume = Helpers.Lerp(leftEarSmoothedVolume, leftEarIncomingVolume, 0.3f);
+            rightEarSmoothedVolume = Helpers.Lerp(rightEarSmoothedVolume, rightEarIncomingVolume, 0.3f);
+            masterSmoothedVolume = Helpers.Lerp(masterSmoothedVolume, masterIncomingVolume, 0.3f);
             
             if (config.Parameters.ContainsKey(audioDirectionParameter))
             {
