@@ -6,9 +6,25 @@
         <RootNamespace>VRC_OSC_AudioEars</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PublishSingleFile>true</PublishSingleFile>
+        <Title>VRC OSC Audio Reaction</Title>
+        <Description>This take the audio from your default audio output device and sends OSC parameters for direction and amplitude.
+
+</Description>
+        <PackageProjectUrl>https://github.com/Codel1417/VRC-OSC-Audio-Reaction</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/Codel1417/VRC-OSC-Audio-Reaction/blob/master/license.txt</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/Codel1417/VRC-OSC-Audio-Reaction</RepositoryUrl>
+        <NeutralLanguage>en-US</NeutralLanguage>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="BuildSoft.OscCore" Version="1.0.5" />
+      <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+      <PackageReference Include="NAudio.Core" Version="2.0.0" />
       <PackageReference Include="NAudio.Wasapi" Version="2.0.0" />
       <PackageReference Include="VRCOscLib" Version="1.1.1" />
     </ItemGroup>

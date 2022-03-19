@@ -2,64 +2,127 @@
 using BuildSoft.VRChat.Osc.Avatar;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using VRC_OSC_AudioEars;
 
+namespace VRC_OSC_AudioEars;
 
-const string audioVolumeParameter = "audio_volume";
-const string audioDirectionParameter = "audio_direction";
-
-Console.WriteLine("Starting...");
-
-// Get Default audio device
-MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
-MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-DirectSoundOut outputDevice = new DirectSoundOut(DirectSoundOut.DSDEVID_DefaultPlayback); // Fixes virtual audio devices by existing?
-
-
-Console.WriteLine("Device: " + device.FriendlyName);
-
-float leftEarSmoothedVolume = 0;
-float rightEarSmoothedVolume = 0;
-float masterSmoothedVolume = 0;
-float leftEarIncomingVolume = 0;
-float rightEarIncomingVolume = 0;
-float masterIncomingVolume = 0;
-float direction = 0;
-
-// ReSharper disable once NotAccessedVariable
-OscAvatarConfig config = await OscAvatarConfig.WaitAndCreateAtCurrentAsync();
-Console.WriteLine("Started");
-
-
-while (true)
+public static class VRChatOscAudio
 {
-    try
+    private const string AudioVolumeParameter = "audio_volume";
+    private const string AudioDirectionParameter = "audio_direction";
+    private const string ParameterPath = "/avatar/parameters/";
+
+    private static float _leftEarSmoothedVolume = 0;
+    private static float _rightEarSmoothedVolume = 0;
+    private static float _leftEarIncomingVolume = 0;
+    private static float _rightEarIncomingVolume = 0;
+    private static float _direction = 0;
+    private static MMDeviceEnumerator enumerator = new();
+    private static MMDevice _device = null;
+    private static WasapiLoopbackCapture _capture = null;
+    private static int _bytesPerSample = 0;
+
+    public static async Task Main(string[] args)
     {
-        config = await OscAvatarConfig.WaitAndCreateAtCurrentAsync();
+        Console.Title = "VRChat OSC Audio";
+        Console.WriteLine("Starting...");
+        // Get Default audio device
+        _device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+        _capture = new WasapiLoopbackCapture(_device);
+        _capture.DataAvailable += OnDataAvailable;
+        _capture.RecordingStopped += OnRecordingStopped;
+        _bytesPerSample = _capture.WaveFormat.BitsPerSample / 8;
+        _capture.StartRecording();
 
-        leftEarIncomingVolume = device.AudioMeterInformation.PeakValues[0];
-        rightEarIncomingVolume = device.AudioMeterInformation.PeakValues[1];
-        masterIncomingVolume = device.AudioMeterInformation.MasterPeakValue;
-
-        leftEarSmoothedVolume = Helpers.Lerp(leftEarSmoothedVolume, leftEarIncomingVolume, 0.3f);
-        rightEarSmoothedVolume = Helpers.Lerp(rightEarSmoothedVolume, rightEarIncomingVolume, 0.3f);
-        masterSmoothedVolume = Helpers.Lerp(masterSmoothedVolume, masterIncomingVolume, 0.3f);
-
-        direction = Math.Clamp(-leftEarSmoothedVolume + rightEarSmoothedVolume + 0.5f, 0, 1);
-        //Write all values to the console
-        Console.WriteLine("Left Ear: " + leftEarSmoothedVolume + " Right Ear: " + rightEarSmoothedVolume + " Master: " + masterSmoothedVolume + " Direction: " + direction);
+        Console.WriteLine("Device: " + _device.FriendlyName + " Bitrate: " + _capture.WaveFormat.BitsPerSample + " SampleRate: " + _capture.WaveFormat.SampleRate);
         
-        OscParameter.SendValue("/avatar/parameters/" + audioDirectionParameter, direction);
+        Console.WriteLine("Waiting for VRChat... Please enable OSC in the VRChat action menu.");
+        Console.WriteLine("If OSC is Already enabled, turn it off and back on.");
+        // ReSharper disable once NotAccessedVariable
+        OscAvatarConfig config = await OscAvatarConfig.WaitAndCreateAtCurrentAsync();
+        Console.WriteLine("Started");
 
-        OscParameter.SendValue("/avatar/parameters/" + audioVolumeParameter, masterSmoothedVolume);
+
+        while (true)
+        {
+            try
+            {
+                config = await OscAvatarConfig.WaitAndCreateAtCurrentAsync();
+                _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume, 0.3f);
+                _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume, 0.3f);
+
+                _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
+                //Write all values to the console
+                decimal d1 = (decimal)_leftEarSmoothedVolume;
+                decimal d2 = (decimal)_rightEarSmoothedVolume;
+                decimal d3 = (decimal)_direction;
+                Console.WriteLine("Left Ear: " + d1.ToString("0.00000") + " Right Ear: " + d2.ToString("0.00000") + " Direction: " + d3.ToString("0.00000"));
+                
+                OscParameter.SendValue(ParameterPath + AudioDirectionParameter, _direction);
+
+                OscParameter.SendValue(ParameterPath + AudioVolumeParameter, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
+            }
+            catch (Exception e)
+            {
+                // Often errors when trying to send a value while changing avatars
+                Console.WriteLine("Error: " + e.Message);
+                await Task.Delay(2000);
+
+            }
+
+
+            await Task.Delay(25);
+            _shouldUpdate = true;
+            
+        }
     }
-    catch (Exception e)
+
+    private static float _left = 0;
+    private static float _right = 0;
+    private static bool _shouldUpdate = false;
+    static void OnDataAvailable(object sender, WaveInEventArgs args)
     {
-        Console.WriteLine(e.Message);
-        await Task.Delay(2000);
-
+        if (_shouldUpdate)
+        {
+            _shouldUpdate = false;
+            _left = 0;
+            _right = 0;
+            // get the RMS of the left and right channels independently for 32 bit audio. ALso Githun Copilot go burr
+            if (_bytesPerSample == 4)
+            {
+                for (int i = 0; i < args.BytesRecorded; i += _bytesPerSample * 2)
+                {
+                    _left += Math.Abs(BitConverter.ToSingle(args.Buffer, i));
+                    _right += Math.Abs(BitConverter.ToSingle(args.Buffer, i + _bytesPerSample));
+                }
+            }
+            else if (_bytesPerSample == 2)
+            {
+                for (int i = 0; i < args.BytesRecorded; i += _bytesPerSample * 2)
+                {
+                    _left += Math.Abs(BitConverter.ToInt16(args.Buffer, i));
+                    _right += Math.Abs(BitConverter.ToInt16(args.Buffer, i + _bytesPerSample));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < args.BytesRecorded; i += _bytesPerSample)
+                {
+                    _left += Math.Abs(BitConverter.ToInt32(args.Buffer, i));
+                    _right += Math.Abs(BitConverter.ToInt32(args.Buffer, i + _bytesPerSample));
+                }
+            }
+            _leftEarIncomingVolume = _left / (args.BytesRecorded / _bytesPerSample);
+            _rightEarIncomingVolume = _right / (args.BytesRecorded / _bytesPerSample);
+        
+            _leftEarIncomingVolume *= 10;
+            _rightEarIncomingVolume *= 10;
+        }
     }
-
-
-    await Task.Delay(10);
+    static void OnRecordingStopped(object sender, StoppedEventArgs e)
+    {
+        _capture.Dispose();
+        _device.Dispose();
+        Environment.Exit(0);
+    }
+    
 }
