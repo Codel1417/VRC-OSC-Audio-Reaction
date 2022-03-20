@@ -18,4 +18,4 @@ Two `float` parameters are available:
 ## Credits
 
 * [NAudio](https://github.com/naudio/NAudio)
-* [VRCOscLib](https://github.com/naudio/NAudio)
+* [VRCOscLib](https://github.com/ChanyaVRC/VRCOscLib)
