@@ -27,7 +27,7 @@ jobs:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
-          ${{ runner.os }}-nuget-
+            ${{ runner.os }}-nuget-
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
