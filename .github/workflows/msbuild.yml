@@ -44,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         # A file, directory or wildcard pattern that describes what to upload
-        path: "VRC-OSC-AudioEars\bin\Release\net6.0\win10-x64\VRC-OSC-AudioEars.exe"
+        path: "VRC-OSC-AudioEars\\bin\\Release\\net6.0\\win10-x64\\VRC-OSC-AudioEars.exe"
