@@ -33,6 +33,7 @@ namespace VRC_OSC_AudioEars
 
         public static async Task Main(string[] args)
         {
+            Helpers.InitLogging();
             Console.Title = "VRChat OSC Audio Reaction";
             Logger.Info("Starting...");
             Helpers.InitSentry();

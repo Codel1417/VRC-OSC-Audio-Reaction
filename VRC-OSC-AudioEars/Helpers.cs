@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Reflection;
+using NLog;
+using NLog.Conditions;
+using NLog.Config;
+using NLog.Targets;
 using Sentry;
 namespace VRC_OSC_AudioEars
 {
@@ -85,6 +89,47 @@ namespace VRC_OSC_AudioEars
             {
                 Logger.Info(SentrySdk.IsEnabled ? "Sentry is enabled" : "Sentry is disabled");
             }
+        }
+
+        public static void InitLogging()
+        {
+            LoggingConfiguration config = new LoggingConfiguration();
+
+            ColoredConsoleTarget consoleTarget = new ColoredConsoleTarget();
+            ConsoleRowHighlightingRule hightlightError = new()
+            {
+                Condition = ConditionParser.ParseExpression("level == LogLevel.Error"),
+                ForegroundColor = ConsoleOutputColor.Red
+            };
+            consoleTarget.RowHighlightingRules.Add(hightlightError);
+            ConsoleRowHighlightingRule hightlightWarn = new()
+            {
+                Condition = ConditionParser.ParseExpression("level == LogLevel.Warn"),
+                ForegroundColor = ConsoleOutputColor.Yellow
+            };
+            consoleTarget.RowHighlightingRules.Add(hightlightWarn);
+            ConsoleRowHighlightingRule hightlightInfo = new ConsoleRowHighlightingRule
+            {
+                Condition = ConditionParser.ParseExpression("level == LogLevel.Info"),
+                ForegroundColor = ConsoleOutputColor.White
+            };
+            consoleTarget.RowHighlightingRules.Add(hightlightInfo);
+            ConsoleRowHighlightingRule hightlightDebug = new ConsoleRowHighlightingRule
+            {
+                Condition = ConditionParser.ParseExpression("level == LogLevel.Debug"),
+                ForegroundColor = ConsoleOutputColor.Gray
+            };
+            consoleTarget.RowHighlightingRules.Add(hightlightDebug);
+            consoleTarget.Layout= "${level}: ${message}";
+
+            FileTarget logfile = new FileTarget("logfile") { FileName = "VRC_OSC_AudioReactuin_Log.txt" };
+            
+            config.AddTarget("console", consoleTarget);
+            config.AddTarget("logfile", logfile);
+            
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+            LogManager.Configuration = config;
         }
     }
 }
