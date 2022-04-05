@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using NLog;
 using NLog.Conditions;
 using NLog.Config;
 using NLog.Targets;
+using Octokit;
 using Sentry;
 using Sentry.NLog;
 
@@ -69,7 +72,7 @@ namespace VRC_OSC_AudioEars
             }
         }
 
-        public static void InitSentry()
+        public static Task InitSentry()
         {
             try {
                 SentrySdk.Init(o  =>
@@ -83,21 +86,22 @@ namespace VRC_OSC_AudioEars
                 {
                     scope.SetTag("os", Environment.OSVersion.ToString());
                     scope.SetTag("arch", Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit");
-                    scope.Platform = Environment.OSVersion.Platform.ToString();
                 });
+                return Task.FromResult(Task.CompletedTask);
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Failed to initialize Sentry");
             } 
             Logger.Info(SentrySdk.IsEnabled ? "Sentry is enabled" : "Sentry is disabled");
+            return Task.CompletedTask;
         }
 
         public static void InitLogging(bool verbose)
         {
-            LoggingConfiguration config = new LoggingConfiguration();
+            LoggingConfiguration config = new();
 
-            ColoredConsoleTarget consoleTarget = new ColoredConsoleTarget();
+            ColoredConsoleTarget consoleTarget = new();
             ConsoleRowHighlightingRule hightlightError = new()
             {
                 Condition = ConditionParser.ParseExpression("level == LogLevel.Error"),
@@ -110,13 +114,13 @@ namespace VRC_OSC_AudioEars
                 ForegroundColor = ConsoleOutputColor.Yellow
             };
             consoleTarget.RowHighlightingRules.Add(hightlightWarn);
-            ConsoleRowHighlightingRule hightlightInfo = new ConsoleRowHighlightingRule
+            ConsoleRowHighlightingRule hightlightInfo = new()
             {
                 Condition = ConditionParser.ParseExpression("level == LogLevel.Info"),
                 ForegroundColor = ConsoleOutputColor.White
             };
             consoleTarget.RowHighlightingRules.Add(hightlightInfo);
-            ConsoleRowHighlightingRule hightlightDebug = new ConsoleRowHighlightingRule
+            ConsoleRowHighlightingRule hightlightDebug = new()
             {
                 Condition = ConditionParser.ParseExpression("level == LogLevel.Debug"),
                 ForegroundColor = ConsoleOutputColor.Gray
@@ -124,9 +128,9 @@ namespace VRC_OSC_AudioEars
             consoleTarget.RowHighlightingRules.Add(hightlightDebug);
             consoleTarget.Layout= "${level}: ${message}";
 
-            FileTarget logfile = new FileTarget("logfile") { FileName = "VRC_OSC_AudioReactuin_Log.txt" };
+            FileTarget logfile = new("logfile") { FileName = "VRC_OSC_AudioReactuion_Log.txt" };
             
-            SentryTarget sentryTarget = new SentryTarget();
+            SentryTarget sentryTarget = new();
             sentryTarget.InitializeSdk = false;
             sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
             
@@ -137,6 +141,47 @@ namespace VRC_OSC_AudioEars
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, sentryTarget);
             LogManager.Configuration = config;
+        }
+
+        public static async Task CheckGitHubNewerVersion()
+        {
+
+            Logger.Debug("Checking GitHub for newer version");
+            try
+            {
+                Logger.Trace("Setting up github client");
+                GitHubClient client = new GitHubClient(new ProductHeaderValue("VRC-OSC-Audio-Reaction"));
+                Logger.Trace("Getting latest release");
+                IReadOnlyList<Release> releases =
+                    await client.Repository.Release.GetAll("Codel1417", "VRC-OSC-Audio-Reaction");
+                if (Helpers.AssemblyProductVersion != "" && releases.Count > 0)
+                {
+                    Logger.Trace("Getting latest release version");
+                    Version latestGitHubVersion = new(releases[0].TagName);
+                    Logger.Trace("Getting local version");
+                    Version localVersion = new(Helpers.AssemblyProductVersion);
+                    Logger.Trace("Comparing versions");
+                    int versionComparison = localVersion.CompareTo(latestGitHubVersion);
+                    if (versionComparison < 0)
+                    {
+                        Logger.Warn("A new version of VRC-OSC-Audio-Reaction is available!");
+                    }
+                    else
+                    {
+                        Logger.Info("You are running the latest version of VRC-OSC-Audio-Reaction!");
+                    }
+                }
+                else
+                {
+                    Logger.Error("Could not check for updates.");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Could not check for updates.");
+            }
+
+            Logger.Trace("Ending check for updates");
         }
     }
 }
