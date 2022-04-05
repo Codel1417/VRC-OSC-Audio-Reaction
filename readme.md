@@ -24,7 +24,7 @@ Two `float` parameters are available:
 
 ## Sentry Reporting
 
-###This app reports crashes to sentry. Data collected during a crash includes
+### This app reports crashes to sentry. Data collected during a crash includes
 
 - The version of this program
 - The audio device info including the name, bit depth, and sample rate
