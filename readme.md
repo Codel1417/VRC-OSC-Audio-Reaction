@@ -1,15 +1,15 @@
 ﻿# VRC OSC Audio Input
 
-This take the audio from your default audio output device and sends OSC parameters for direction and amplitude.
+This application takes the audio from your default audio output device and then sends the OSC parameters for direction and amplitude.
 
 ### Parameters
 
 Two `float` parameters are available:
 
 1) `audio_direction` at `/avatar/parameters/audio_direction`: the direction of the sound. Where 0.5 is centered, 0 is left 1 is right.
-2) `audio_volume` at `/avatar/parameters/audio_volume`: the volume of the sound. Where 0 is silent, 1 is loud. This is based on the Windows Audio API
+2) `audio_volume` at `/avatar/parameters/audio_volume`: the volume of the sound. Where 0 is silent, 1 is loud. This is based on the Windows Audio API.
 
-## How to use
+## How to Use
 
 1) Add the synced float parameters `audio_volume` and `audio_direction` to your VRChat avatar.
 2) Enable OSC in VRChat inside the Action Menu.
@@ -24,13 +24,13 @@ Two `float` parameters are available:
 
 ## Sentry Reporting
 
-### This app reports crashes to sentry. Data collected during a crash includes
+### This application reports crashes to [Sentry](https://sentry.io/). Data collected during a crash includes
 
-- The version of this program
-- The audio device info including the name, bit depth, and sample rate
-- OS Version
-- Logged Messages
-- Stack Traces if available
+- The version of this program.
+- The audio device info including the name, bit depth, and sample rate.
+- OS Version.
+- Logged Messages.
+- Stack Traces if available.
 
 All data is anonymous and no personal information is collected. 
 Data is only sent in the event of an error 
