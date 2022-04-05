@@ -43,16 +43,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BuildSoft.OscCore" Version="1.0.5" />
+        <PackageReference Include="CommandLineParser" Version="2.8.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="NAudio.Core" Version="2.0.0" />
         <PackageReference Include="NAudio.Wasapi" Version="2.0.0" />
         <PackageReference Include="NLog" Version="4.7.15" />
-            <None Update="nlog.config" CopyToOutputDirectory="Always" />
         <PackageReference Include="Octokit" Version="0.50.0" />
         <PackageReference Include="Sentry" Version="3.15.0" />
+        <PackageReference Include="Sentry.NLog" Version="3.15.0" />
         <PackageReference Include="VRCOscLib" Version="1.1.2" />
-
     </ItemGroup>
 
 </Project>

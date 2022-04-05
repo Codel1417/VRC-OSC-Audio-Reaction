@@ -5,6 +5,8 @@ using NLog.Conditions;
 using NLog.Config;
 using NLog.Targets;
 using Sentry;
+using Sentry.NLog;
+
 namespace VRC_OSC_AudioEars
 {
     public static class Helpers
@@ -69,29 +71,29 @@ namespace VRC_OSC_AudioEars
 
         public static void InitSentry()
         {
-            SentrySdk.Init(o  =>
-                   {
-                       o.Dsn = "https://c39539385af440b2854d2d558c4d8d82@o1187002.ingest.sentry.io/6307588";
-                       o.Environment = IsDebugBuild ? "Debug" : "Release";
-                       o.Debug = IsDebugBuild;
-                       o.TracesSampleRate = 1.0;
-                       o.AttachStacktrace = true;
-                   });
-            SentrySdk.ConfigureScope(scope =>
-            {
-                scope.SetTag("os", Environment.OSVersion.ToString());
-                scope.SetTag("arch", Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit");
-                scope.SetTag("version", AssemblyProductVersion);
-                scope.Platform = Environment.OSVersion.Platform.ToString();
-                scope.SetTag("build_type", IsDebugBuild ? "Debug" : "Release");
-                scope.SetExtra("CommandLine", Environment.CommandLine);
-            });
-            {
-                Logger.Info(SentrySdk.IsEnabled ? "Sentry is enabled" : "Sentry is disabled");
+            try {
+                SentrySdk.Init(o  =>
+                {
+                    o.Dsn = "https://c39539385af440b2854d2d558c4d8d82@o1187002.ingest.sentry.io/6307588";
+                    o.Environment = IsDebugBuild ? "Debug" : "Release";
+                    o.Debug = IsDebugBuild;
+                    o.TracesSampleRate = 0;
+                });
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.SetTag("os", Environment.OSVersion.ToString());
+                    scope.SetTag("arch", Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit");
+                    scope.Platform = Environment.OSVersion.Platform.ToString();
+                });
             }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to initialize Sentry");
+            } 
+            Logger.Info(SentrySdk.IsEnabled ? "Sentry is enabled" : "Sentry is disabled");
         }
 
-        public static void InitLogging()
+        public static void InitLogging(bool verbose)
         {
             LoggingConfiguration config = new LoggingConfiguration();
 
@@ -124,11 +126,16 @@ namespace VRC_OSC_AudioEars
 
             FileTarget logfile = new FileTarget("logfile") { FileName = "VRC_OSC_AudioReactuin_Log.txt" };
             
+            SentryTarget sentryTarget = new SentryTarget();
+            sentryTarget.InitializeSdk = false;
+            sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
+            
             config.AddTarget("console", consoleTarget);
             config.AddTarget("logfile", logfile);
-            
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, consoleTarget);
+            config.AddTarget("sentry", sentryTarget);
+            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, consoleTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, sentryTarget);
             LogManager.Configuration = config;
         }
     }
