@@ -20,22 +20,15 @@ namespace VRC_OSC_AudioEars
         {
             [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
             public bool Verbose { get; set; }
-            [Option('s',"sentry", Required = false, HelpText = "Disable Sentry error reporting.")]
+            [Option('s',"no-sentry", Required = false, HelpText = "Disable Sentry error reporting.")]
             public bool DisableSentry { get; set; }
         }
         // ReSharper enable MemberHidesStaticFromOuterClass
 
-        
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public static bool Verbose { get; set; }
         public static bool DisableSentry { get; set; }
-
-
-
         
-
-        
-
         public static async Task Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args)
