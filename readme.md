@@ -19,12 +19,14 @@ Two `float` parameters are available:
 1) `audio_direction` at `/avatar/parameters/audio_direction`: the direction of the sound. Where 0.5 is centered, 0 is left 1 is right.
 2) `audio_volume` at `/avatar/parameters/audio_volume`: the volume of the sound. Where 0 is silent, 1 is loud. This is based on the Windows Audio API.
 
+Feel free to suggest other parameters.
+
 ### Optional Command Line Arguments
 
-- `--sentry` : Disables the use of Sentry for error reporting.
-- `--verbose` : Enables verbose logging.
-- `--version` : Displays the version of this program.
-- `--help` : Displays this help message.
+- `--sentry` | Disables the use of Sentry for error reporting.
+- `--verbose` | Enables verbose logging.
+- `--version` | Displays the version of this program.
+- `--help` | Displays this help message.
 
 ## Sentry Reporting
 
@@ -40,11 +42,10 @@ All data is anonymous and no personal information is collected.
 Data is only sent in the event of an error 
 To opt out of this reporting, run this program with the `--sentry` flag.
 
-## Credits
-
-* [NAudio](https://github.com/naudio/NAudio)
-* [VRCOscLib](https://github.com/ChanyaVRC/VRCOscLib)
-
 ## License
 
 This program is licensed under the [MIT license](LICENSE).
+
+## Future Plans
+
+* A graphical interface instead of command line.
