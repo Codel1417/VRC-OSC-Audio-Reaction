@@ -14,7 +14,7 @@ namespace VRC_OSC_AudioEars
 {
     public static class Helpers
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Linear interpolation between two values.
@@ -77,7 +77,7 @@ namespace VRC_OSC_AudioEars
             try {
                 SentrySdk.Init(o  =>
                 {
-                    o.Dsn = "https://c39539385af440b2854d2d558c4d8d82@o1187002.ingest.sentry.io/6307588";
+                    o.Dsn = Constants.SENTRY_DSN;
                     o.Environment = IsDebugBuild ? "Debug" : "Release";
                     o.Debug = IsDebugBuild;
                     o.TracesSampleRate = 0;
@@ -150,10 +150,10 @@ namespace VRC_OSC_AudioEars
             try
             {
                 Logger.Trace("Setting up github client");
-                GitHubClient client = new GitHubClient(new ProductHeaderValue("VRC-OSC-Audio-Reaction"));
+                GitHubClient client = new GitHubClient(new ProductHeaderValue(Constants.project_name));
                 Logger.Trace("Getting latest release");
                 IReadOnlyList<Release> releases =
-                    await client.Repository.Release.GetAll("Codel1417", "VRC-OSC-Audio-Reaction");
+                    await client.Repository.Release.GetAll(Constants.project_user,Constants.project_name);
                 if (Helpers.AssemblyProductVersion != "" && releases.Count > 0)
                 {
                     Logger.Trace("Getting latest release version");

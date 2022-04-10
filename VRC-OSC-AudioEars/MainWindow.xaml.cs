@@ -39,6 +39,7 @@ namespace VRC_OSC_AudioEars
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
+            await Properties.Load();
             audio.mainWindow = this;
             Logger.Info($"Version: {Helpers.AssemblyProductVersion}");
             string[] args = Environment.GetCommandLineArgs();
@@ -82,7 +83,7 @@ namespace VRC_OSC_AudioEars
 
         private void osc_dir_par_input_Initialized(object sender, EventArgs e) => osc_dir_par_input.Text = Properties.audio_direction_parameter;
 
-        private void save_config_Click(object sender, RoutedEventArgs e)
+        private async void save_config_Click(object sender, RoutedEventArgs e)
         {
             Properties.gain = (float)Gain.Value;
             Properties.audio_direction_parameter = osc_dir_par_input.Text.Trim();
@@ -91,6 +92,7 @@ namespace VRC_OSC_AudioEars
             OscUtility.SendPort = Properties.port;
             Properties.sentry_reporting_enabled = senry_enabled_checkbox.IsChecked ?? true;
             settings_window.IsPopupOpen = false;
+            Properties.Save();
         }
 
         private void osc_port_input_Initialized(object sender, EventArgs e) => osc_port_input.Text = Properties.port.ToString();
