@@ -24,6 +24,8 @@ public class Audio
         private MMDevice? _device = null;
         private WasapiLoopbackCapture? _capture = null;
         private int _bytesPerSample = 0;
+
+        public MainWindow? mainWindow;
         private void OnDataAvailable(object sender, WaveInEventArgs args)
         {
             if (_shouldUpdate)
@@ -84,7 +86,8 @@ public class Audio
             Logger.Trace("Starting capture");
             _capture.StartRecording();
             Logger.Info("Device: " + _device.FriendlyName + " Bitrate: " + _capture.WaveFormat.BitsPerSample + " SampleRate: " + _capture.WaveFormat.SampleRate);
-            
+            mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.deviceName.Text = _device.DeviceFriendlyName));
+
             Logger.Debug("Configuring Sentry scope");
             
             SentrySdk.ConfigureScope(scope => scope.Contexts["Audio Device"] = new
@@ -104,7 +107,10 @@ public class Audio
                 message: "Audio Set Up " + _device.FriendlyName,
                 category: "Audio",
                 level: BreadcrumbLevel.Info);
-            return Task.CompletedTask;
+
+        OscUtility.SendPort = Properties.port;
+
+        return Task.CompletedTask;
         }
 
         public async Task Update()
@@ -123,7 +129,7 @@ public class Audio
                     }
                     _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
                     //log values with fixed decimal places
-                    Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
+                    //Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
                     OscParameter.SendAvatarParameter(Constants.AudioDirectionParameter, _direction);;
                     OscParameter.SendAvatarParameter(Constants.AudioVolumeParameter, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
                 }
@@ -135,10 +141,16 @@ public class Audio
                     await Task.Delay(2000);
                 }
 
-
+                UpdateUI();
                 await Task.Delay(25);
                 _shouldUpdate = true;
 
             }
         }
+    public void UpdateUI()
+    {
+        mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.leftAudioMeter.Value = _leftEarSmoothedVolume));
+        mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.rightAudioMeter.Value = _rightEarSmoothedVolume));
+
+    }
 }
