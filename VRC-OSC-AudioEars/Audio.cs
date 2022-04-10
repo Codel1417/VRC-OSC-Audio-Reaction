@@ -117,10 +117,17 @@ public class Audio
         {
             while (true)
             {
+                if (Properties.enabled == false) {
+                    await Task.Delay(25);
+                    continue;
+                }
+
+
+
                 try
                 {
-                    _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume, 0.3f);
-                    _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume, 0.3f);
+                    _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume * Properties.gain, 0.3f);
+                    _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume * Properties.gain, 0.3f);
                     if (float.IsNaN(_leftEarSmoothedVolume) || float.IsNaN(_rightEarSmoothedVolume) || float.IsInfinity(_leftEarSmoothedVolume) || float.IsInfinity(_rightEarSmoothedVolume))
                     {
                         // handle nan
@@ -130,8 +137,8 @@ public class Audio
                     _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
                     //log values with fixed decimal places
                     //Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
-                    OscParameter.SendAvatarParameter(Constants.AudioDirectionParameter, _direction);;
-                    OscParameter.SendAvatarParameter(Constants.AudioVolumeParameter, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
+                    OscParameter.SendAvatarParameter(Properties.audio_direction_parameter, _direction);;
+                    OscParameter.SendAvatarParameter(Properties.audio_volume_parameter, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
                 }
                 catch (Exception e)
                 {

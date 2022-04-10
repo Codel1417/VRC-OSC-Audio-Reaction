@@ -24,38 +24,18 @@ namespace VRC_OSC_AudioEars
         {
             Helpers.InitLogging(false);
             InitializeComponent();
-            
         }
 
         public static bool Verbose { get; set; }
         public static bool DisableSentry { get; set; }
 
-        private void OnGainSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            Properties.gain = (float) e.NewValue;
-        }
-
-        private void OnErrorReportingEnabled(object sender, RoutedEventArgs e)
-        {
-            DisableSentry = false;
-        }
-
-        private void OnErrorReportingUnchecked(object sender, RoutedEventArgs e)
-        {
-            DisableSentry = true;
-        }
+        private void OnGainSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => Properties.gain = (float)e.NewValue;
 
 
-        private void OnEnableApp(object sender, RoutedEventArgs e)
-        {
-            Properties.enabled = true;
-        }
 
-        private void OnDisableApp(object sender, RoutedEventArgs e)
-        {
-            Properties.enabled = false;
+        private void OnEnableApp(object sender, RoutedEventArgs e) => Properties.enabled = true;
 
-        }
+        private void OnDisableApp(object sender, RoutedEventArgs e) => Properties.enabled = false;
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
@@ -65,7 +45,8 @@ namespace VRC_OSC_AudioEars
             Parser.Default.ParseArguments<CLI_Options>(args)
                 .WithParsed(options => RunOptions(options))
                 .WithNotParsed(errors => HandleParseError(errors));
-            if (!DisableSentry) await Helpers.InitSentry();
+            //Load settings
+            if (Properties.sentry_reporting_enabled) await Helpers.InitSentry();
             await Helpers.CheckGitHubNewerVersion().ConfigureAwait(false); // Don't wait for it
             await audio.SetUpAudio().ConfigureAwait(false);
             await audio.Update().ConfigureAwait(false);
@@ -85,28 +66,35 @@ namespace VRC_OSC_AudioEars
             }
             if (obj.DisableSentry)
             {
-                DisableSentry = true;
+                Properties.sentry_reporting_enabled = false;
             }
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Environment.Exit(0);
-        }
+        private void Window_Closed(object sender, EventArgs e) => Environment.Exit(0);
 
-        private void OnPortInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-            e.Handled = int.TryParse(e.Text, out Properties.port);
-            if (e.Handled)
-            {
-                OscUtility.SendPort = Properties.port;
-            }
-        }
-
-            private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
         }
+
+        private void osc_vol_par_input_Initialized(object sender, EventArgs e) => osc_vol_par_input.Text = Properties.audio_volume_parameter;
+
+        private void osc_dir_par_input_Initialized(object sender, EventArgs e) => osc_dir_par_input.Text = Properties.audio_direction_parameter;
+
+        private void save_config_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.gain = (float)Gain.Value;
+            Properties.audio_direction_parameter = osc_dir_par_input.Text.Trim();
+            Properties.audio_volume_parameter = osc_vol_par_input.Text.Trim();
+            int.TryParse(osc_port_input.Text, out Properties.port);
+            OscUtility.SendPort = Properties.port;
+            Properties.sentry_reporting_enabled = senry_enabled_checkbox.IsChecked ?? true;
+            settings_window.IsPopupOpen = false;
+        }
+
+        private void osc_port_input_Initialized(object sender, EventArgs e) => osc_port_input.Text = Properties.port.ToString();
+
+        private void senry_enabled_checkbox_Initialized(object sender, EventArgs e) => senry_enabled_checkbox.IsChecked = Properties.sentry_reporting_enabled;
     }
 }
