@@ -8,6 +8,7 @@ using NLog.Config;
 using NLog.Targets;
 using Octokit;
 using Sentry;
+using Sentry.Infrastructure;
 using Sentry.NLog;
 
 namespace VRC_OSC_AudioEars
@@ -81,6 +82,8 @@ namespace VRC_OSC_AudioEars
                     o.Environment = IsDebugBuild ? "Debug" : "Release";
                     o.Debug = IsDebugBuild;
                     o.TracesSampleRate = 0;
+                    o.AttachStacktrace = true;
+                    o.UseAsyncFileIO = true;
                 });
                 SentrySdk.ConfigureScope(scope =>
                 {
@@ -133,11 +136,16 @@ namespace VRC_OSC_AudioEars
             SentryTarget sentryTarget = new();
             sentryTarget.InitializeSdk = false;
             sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
-            
+            DiagnosticListenerTarget diagnosticListenerTarget = new();
+            TraceTarget traceTarget = new();
+            config.AddTarget("trace", traceTarget);
+            config.AddTarget("diagnostic",diagnosticListenerTarget);
             config.AddTarget("console", consoleTarget);
             config.AddTarget("logfile", logfile);
             config.AddTarget("sentry", sentryTarget);
+            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, diagnosticListenerTarget);
             config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, consoleTarget);
+            config.AddRule(LogLevel.Trace, LogLevel.Fatal, traceTarget);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, sentryTarget);
             LogManager.Configuration = config;
