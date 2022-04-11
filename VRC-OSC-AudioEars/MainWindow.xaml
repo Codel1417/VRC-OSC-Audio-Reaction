@@ -25,10 +25,11 @@
                             FontSize="22"
                             Margin="-152,0,0,0"
                             AutomationProperties.Name="VRC OSC Audio Reaction"
+                            Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
                             Text="VRC OSC Audio Reaction"/>
                             <materialDesign:PopupBox x:Name="settings_window" Content="PopupBox" HorizontalAlignment="Right" StaysOpen="True" PlacementMode="LeftAndAlignTopEdges" ToolTip="Settings" >
                                 <materialDesign:PopupBox.ToggleContent>
-                                    <materialDesign:PackIcon Kind="CogOutline" Foreground="{DynamicResource MaterialDesignBackground}" HorizontalAlignment="Center" Height="30" VerticalAlignment="Center" Width="30
+                                    <materialDesign:PackIcon Kind="CogOutline" Foreground="{DynamicResource MaterialDesignForeground}" HorizontalAlignment="Center" Height="30" VerticalAlignment="Center" Width="30
                                                              "/>
                                 </materialDesign:PopupBox.ToggleContent>
                                 <materialDesign:Card Padding="20" Margin="10" Width="400">
@@ -44,13 +45,13 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Direction Parameter "/></TextBlock>
-                                            <TextBox x:Name="osc_dir_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="audio_direction" Initialized="osc_dir_par_input_Initialized" />
+                                            <TextBox x:Name="osc_dir_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="audio_direction" Initialized="Osc_dir_par_input_Initialized" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Volume Parameter "/></TextBlock>
-                                            <TextBox x:Name="osc_vol_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="audio_volume" Initialized="osc_vol_par_input_Initialized" />
+                                            <TextBox x:Name="osc_vol_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="audio_volume" Initialized="Osc_vol_par_input_Initialized" />
                                         </StackPanel>
-                                        <Button x:Name="save_config" Style="{DynamicResource MaterialDesignPaperButton}" Click="save_config_Click" Content="Save Config" Margin="0,20,0,10"></Button>
+                                        <Button x:Name="save_config" Style="{DynamicResource MaterialDesignPaperButton}" Click="Save_config_Click" Content="Save Config" Margin="0,20,0,10"></Button>
                                     </StackPanel>
                                 </materialDesign:Card>
                             </materialDesign:PopupBox>

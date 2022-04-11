@@ -19,7 +19,7 @@ namespace VRC_OSC_AudioEars
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         Audio audio = new();
-
+        WindowColor windowColor = new WindowColor();
         public MainWindow()
         {
             Helpers.InitLogging(false);
@@ -79,11 +79,11 @@ namespace VRC_OSC_AudioEars
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void osc_vol_par_input_Initialized(object sender, EventArgs e) => osc_vol_par_input.Text = Properties.audio_volume_parameter;
+        private void Osc_vol_par_input_Initialized(object sender, EventArgs e) => osc_vol_par_input.Text = Properties.audio_volume_parameter;
 
-        private void osc_dir_par_input_Initialized(object sender, EventArgs e) => osc_dir_par_input.Text = Properties.audio_direction_parameter;
+        private void Osc_dir_par_input_Initialized(object sender, EventArgs e) => osc_dir_par_input.Text = Properties.audio_direction_parameter;
 
-        private async void save_config_Click(object sender, RoutedEventArgs e)
+        private async void Save_config_Click(object sender, RoutedEventArgs e)
         {
             Properties.gain = (float)Gain.Value;
             Properties.audio_direction_parameter = osc_dir_par_input.Text.Trim();

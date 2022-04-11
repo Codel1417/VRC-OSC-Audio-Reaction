@@ -9,5 +9,7 @@ namespace VRC_OSC_AudioEars
         public const string config_file = "config.json";
         public const string project_name = "VRC-OSC-Audio-Reaction";
         public const string project_user = "Codel1417";
+
+        public static readonly Windows.UI.Color darkBackground = Windows.UI.Color.FromArgb(255, 0, 0, 0);
     }
 }

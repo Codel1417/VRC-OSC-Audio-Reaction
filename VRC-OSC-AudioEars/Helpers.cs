@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using MaterialDesignThemes.Wpf;
 using NLog;
 using NLog.Conditions;
 using NLog.Config;
 using NLog.Targets;
 using Octokit;
 using Sentry;
-using Sentry.Infrastructure;
 using Sentry.NLog;
+using Windows.UI.ViewManagement;
 
 namespace VRC_OSC_AudioEars
 {
@@ -191,5 +193,6 @@ namespace VRC_OSC_AudioEars
 
             Logger.Trace("Ending check for updates");
         }
+
     }
 }
