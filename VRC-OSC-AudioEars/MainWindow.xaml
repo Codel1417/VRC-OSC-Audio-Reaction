@@ -5,14 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VRC_OSC_AudioEars"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" x:Class="VRC_OSC_AudioEars.MainWindow"
+
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         Title="VRC OSC Audio Reaction" Height="606" Width="438" MinWidth="450" SizeToContent="Height" MaxWidth="450" ResizeMode="CanMinimize" Initialized="Window_Initialized" Closed="Window_Closed">
+    <Window.Resources>
+        <materialDesign:NotConverter x:Key="NotConverter"/>
+    </Window.Resources>
     <materialDesign:DialogHost>
         <materialDesign:DrawerHost>
             <StackPanel>
-                <DockPanel> 
+                <DockPanel>
                     <materialDesign:ColorZone
                     Padding="16"
                     materialDesign:ShadowAssist.ShadowDepth="Depth2"
@@ -37,21 +41,23 @@
                                         <TextBlock x:Name="title" Style="{DynamicResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Center"><Run Text="Settings"/></TextBlock>
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="Error Reporting "/></TextBlock>
-                                            <CheckBox x:Name="senry_enabled_checkbox" Style="{DynamicResource MaterialDesignSwitchToggleButton}" Initialized="senry_enabled_checkbox_Initialized"/>
+                                            <CheckBox x:Name="senry_enabled_checkbox" Style="{DynamicResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Source={x:Static local:Settings.Default}, Path=error_reporting, Mode=TwoWay}"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Port "/></TextBlock>
-                                            <TextBox x:Name="osc_port_input" Style="{DynamicResource MaterialDesignTextBox}" PreviewTextInput="NumberValidationTextBox" Width="50" MaxLines="1" MaxLength="5" Text="9000" Initialized="osc_port_input_Initialized"/>
+                                            <TextBox x:Name="osc_port_input" Style="{DynamicResource MaterialDesignTextBox}" PreviewTextInput="Osc_port_input_PreviewTextInput" Width="50" MaxLines="1" MaxLength="5" Text="{Binding Source={x:Static local:Settings.Default}, Path=port, Mode=TwoWay}"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Direction Parameter "/></TextBlock>
-                                            <TextBox x:Name="osc_dir_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="audio_direction" Initialized="Osc_dir_par_input_Initialized" />
+                                            <TextBox x:Name="osc_dir_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="{Binding Source={x:Static local:Settings.Default}, Path=audio_direction, Mode=TwoWay}"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Volume Parameter "/></TextBlock>
-                                            <TextBox x:Name="osc_vol_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="audio_volume" Initialized="Osc_vol_par_input_Initialized" />
+                                            <TextBox x:Name="osc_vol_par_input" Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="{Binding Source={x:Static local:Settings.Default}, Path=audio_volume, Mode=TwoWay}"/>
                                         </StackPanel>
-                                        <Button x:Name="save_config" Style="{DynamicResource MaterialDesignPaperButton}" Click="Save_config_Click" Content="Save Config" Margin="0,20,0,10"></Button>
+                                        <Button x:Name="save_config" Style="{DynamicResource MaterialDesignFlatAccentBgButton}" Click="Save_config_Click" Content="Save Config" Margin="0,20,0,10"></Button>
+                                        <Button x:Name="reset_config" Style="{DynamicResource MaterialDesignFlatSecondaryButton}" Click="Reset_config_Click" Content="Reset Config" Margin="0,0,0,10"></Button>
+
                                     </StackPanel>
                                 </materialDesign:Card>
                             </materialDesign:PopupBox>
@@ -66,7 +72,7 @@
                         <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Center"><Run Text="Controls"/></TextBlock>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="35">
                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,0,0,4"><Run Text="Gain"/></TextBlock>
-                            <Slider x:Name="Gain" Height="28" Margin="20,0,20,0" VerticalAlignment="Stretch" TickPlacement="None" Width="304" ValueChanged="OnGainSliderChanged" Value="1" Maximum="2" RenderTransformOrigin="0.5,0.5" >
+                            <Slider x:Name="Gain" Height="28" Margin="20,0,20,0" VerticalAlignment="Stretch" TickPlacement="None" Width="304" Value="{Binding Source={x:Static local:Settings.Default}, Path=gain, Mode=TwoWay}" Maximum="2" RenderTransformOrigin="0.5,0.5" >
                                 <Slider.RenderTransform>
                                     <TransformGroup>
                                         <ScaleTransform/>
@@ -79,8 +85,8 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="Enabled?"/></TextBlock>
-                            <RadioButton GroupName="Active" Content="Enabled" Margin="10,0,10,0" Checked="OnEnableApp" />
-                            <RadioButton GroupName="Active" Content="Disabled" IsChecked="True" Checked="OnDisableApp"/>
+                            <RadioButton x:Name="radioButton" GroupName="Active" Content="Enabled" Margin="10,0,10,0" IsChecked="{Binding Source={x:Static local:Settings.Default}, Path=enabled, Mode=TwoWay}"/>
+                            <RadioButton GroupName="Active" Content="Disabled" IsChecked="{Binding IsChecked, Converter={StaticResource NotConverter}, ElementName=radioButton}"/>
                         </StackPanel>
                     </StackPanel>
                 </materialDesign:Card>

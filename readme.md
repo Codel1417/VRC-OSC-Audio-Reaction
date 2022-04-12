@@ -21,15 +21,6 @@ Two `float` parameters are available:
 
 Feel free to suggest other parameters.
 
-### Optional Command Line Arguments
-
-| Option        | Description                                     |
-|---------------|-------------------------------------------------|
-| `--no-sentry` | Disables the use of Sentry for error reporting. |
-| `--verbose`   | Enables verbose logging.                        |
-| `--version`   | Displays the version of this program.           |
-| `--help`      | Displays this help message.                     |
-
 ## Sentry Reporting
 
 ### This application reports crashes to [Sentry](https://sentry.io/). Data collected during a crash includes
@@ -40,18 +31,10 @@ Feel free to suggest other parameters.
 - Logged Messages.
 - Stack Traces if available.
 
-All data is anonymous and no personal information is collected. 
-Data is only sent in the event of an error 
-To opt out of this reporting, run this program with the `--sentry` flag.
+All data is anonymous and no personal information is collected.
+Data is only sent in the event of an error.
+You can opt out in settings
 
 ## License
 
 This program is licensed under the [MIT license](LICENSE).
-
-## Future Plans
-
-* A graphical interface instead of command line.
-  * Option to use a different audio device.
-  * Graphical options
-  * Graphical view of the parameters.
-* Gain control.

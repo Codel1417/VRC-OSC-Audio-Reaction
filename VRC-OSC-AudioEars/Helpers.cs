@@ -11,7 +11,6 @@ using NLog.Targets;
 using Octokit;
 using Sentry;
 using Sentry.NLog;
-using Windows.UI.ViewManagement;
 
 namespace VRC_OSC_AudioEars
 {

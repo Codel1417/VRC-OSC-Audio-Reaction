@@ -108,7 +108,7 @@ public class Audio
                 category: "Audio",
                 level: BreadcrumbLevel.Info);
 
-        OscUtility.SendPort = Properties.port;
+        OscUtility.SendPort = Settings.Default.port;
 
         return Task.CompletedTask;
         }
@@ -117,17 +117,15 @@ public class Audio
         {
             while (true)
             {
-                if (Properties.enabled == false) {
+                if (Settings.Default.enabled == false) {
                     await Task.Delay(25);
                     continue;
                 }
 
-
-
                 try
                 {
-                    _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume * Properties.gain, 0.3f);
-                    _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume * Properties.gain, 0.3f);
+                    _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume * Settings.Default.gain, 0.3f);
+                    _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume * Settings.Default.gain, 0.3f);
                     if (float.IsNaN(_leftEarSmoothedVolume) || float.IsNaN(_rightEarSmoothedVolume) || float.IsInfinity(_leftEarSmoothedVolume) || float.IsInfinity(_rightEarSmoothedVolume))
                     {
                         // handle nan
@@ -137,8 +135,8 @@ public class Audio
                     _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
                     //log values with fixed decimal places
                     //Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
-                    OscParameter.SendAvatarParameter(Properties.audio_direction_parameter, _direction);;
-                    OscParameter.SendAvatarParameter(Properties.audio_volume_parameter, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
+                    OscParameter.SendAvatarParameter(Settings.Default.audio_direction, _direction);;
+                    OscParameter.SendAvatarParameter(Settings.Default.audio_volume, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
                 }
                 catch (Exception e)
                 {
