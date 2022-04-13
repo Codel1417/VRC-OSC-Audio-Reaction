@@ -25,7 +25,6 @@
         <PublishTrimmed>false</PublishTrimmed>
         <PublishReadyToRun>true</PublishReadyToRun>
         <PublishProfile>Release</PublishProfile>
-	    <TargetPlatformVersion>10</TargetPlatformVersion>
 	    <DebugType>embedded</DebugType>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <AssemblyVersion>1.0.0</AssemblyVersion>
@@ -35,12 +34,13 @@
         <Company>Codel1417</Company>
         <AssemblyName>VRC_OSC_AudioEars</AssemblyName>
         <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-	    <TargetFramework>net5.0-windows10.0.18362</TargetFramework>
+	    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
         <UseWPF>true</UseWPF>
         <LangVersion>10</LangVersion>
 	    <WarningLevel>4</WarningLevel>
 	    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 	    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+	    <SignAssembly>False</SignAssembly>
 </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="MaterialDesignColors" Version="2.0.5" />

@@ -84,9 +84,8 @@
                             </Slider>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="Enabled?"/></TextBlock>
-                            <RadioButton x:Name="radioButton" GroupName="Active" Content="Enabled" Margin="10,0,10,0" IsChecked="{Binding Source={x:Static local:Settings.Default}, Path=enabled, Mode=TwoWay}"/>
-                            <RadioButton GroupName="Active" Content="Disabled" IsChecked="{Binding IsChecked, Converter={StaticResource NotConverter}, ElementName=radioButton}"/>
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Enabled"/></TextBlock>
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}" x:Name="radioButton" Margin="10,0,10,0" IsChecked="{Binding Source={x:Static local:Settings.Default}, Path=enabled, Mode=TwoWay}"/>
                         </StackPanel>
                     </StackPanel>
                 </materialDesign:Card>
@@ -107,10 +106,7 @@
                         </StackPanel>
                     </StackPanel>
                 </materialDesign:Card>
-                <materialDesign:Snackbar
-                        x:Name="MainSnackbar"
-                        MessageQueue="{materialDesign:MessageQueue}"
-                        Height="52" Width="448"/>
+                <materialDesign:Snackbar x:Name="SnackBar" MessageQueue="{materialDesign:MessageQueue}" HorizontalAlignment="Stretch" />
             </StackPanel>
         </materialDesign:DrawerHost>
     </materialDesign:DialogHost>

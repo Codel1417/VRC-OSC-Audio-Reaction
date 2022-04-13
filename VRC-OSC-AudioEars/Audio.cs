@@ -25,7 +25,6 @@ public class Audio
         private WasapiLoopbackCapture? _capture = null;
         private int _bytesPerSample = 0;
 
-        public MainWindow? mainWindow;
         private void OnDataAvailable(object sender, WaveInEventArgs args)
         {
             if (_shouldUpdate)
@@ -86,7 +85,7 @@ public class Audio
             Logger.Trace("Starting capture");
             _capture.StartRecording();
             Logger.Info("Device: " + _device.FriendlyName + " Bitrate: " + _capture.WaveFormat.BitsPerSample + " SampleRate: " + _capture.WaveFormat.SampleRate);
-            mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.deviceName.Text = _device.DeviceFriendlyName));
+            Helpers.mainWindow.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.deviceName.Text = _device.DeviceFriendlyName));
 
             Logger.Debug("Configuring Sentry scope");
             
@@ -154,8 +153,8 @@ public class Audio
         }
     public void UpdateUI()
     {
-        mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.leftAudioMeter.Value = _leftEarSmoothedVolume));
-        mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.rightAudioMeter.Value = _rightEarSmoothedVolume));
+        Helpers.mainWindow.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.leftAudioMeter.Value = _leftEarSmoothedVolume));
+        Helpers.mainWindow.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.rightAudioMeter.Value = _rightEarSmoothedVolume));
 
     }
 }

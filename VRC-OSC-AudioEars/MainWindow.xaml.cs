@@ -1,5 +1,4 @@
-﻿using NAudio.CoreAudioApi;
-using NLog;
+﻿using NLog;
 using System;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -13,19 +12,18 @@ namespace VRC_OSC_AudioEars
     public partial class MainWindow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         public Audio audio = new();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Runs in background")]
         private readonly WindowColor windowColor = new();
         public MainWindow()
         {
+            Helpers.mainWindow = this;
             Helpers.InitLogging(false);
             InitializeComponent();
         }
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
-            audio.mainWindow = this;
             Logger.Info($"Version: {Helpers.AssemblyProductVersion}");
             //Load settings
             if (Settings.Default.error_reporting) await Helpers.InitSentry();
@@ -38,16 +36,28 @@ namespace VRC_OSC_AudioEars
         private void Window_Closed(object sender, EventArgs e) => Environment.Exit(0);
 
 
-        private void Save_config_Click(object sender, RoutedEventArgs e) => Settings.Default.Save();
-
-
+        private void Save_config_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.Save();
+            if (SnackBar != null && SnackBar.MessageQueue != null)
+            {
+                SnackBar.MessageQueue.Enqueue("Settings Saved!");
+            }
+        }
 
         private void Osc_port_input_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("[^0-9]+");
+            Regex regex = new("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void Reset_config_Click(object sender, RoutedEventArgs e) => Settings.Default.Reset();
+        private void Reset_config_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.Reset();
+            if (SnackBar != null && SnackBar.MessageQueue != null)
+            {
+                SnackBar.MessageQueue.Enqueue("Settings Reset!");
+            }
+        }
     }
 }

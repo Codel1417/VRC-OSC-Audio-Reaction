@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using MaterialDesignThemes.Wpf;
 using NLog;
 using NLog.Conditions;
 using NLog.Config;
@@ -25,6 +23,8 @@ namespace VRC_OSC_AudioEars
         /// <param name="secondFloat">The Right Value (1)</param>
         /// <param name="by">Lerp Point</param>
         /// <returns></returns>
+        /// 
+        public static MainWindow? mainWindow;
         public static float Lerp(float firstFloat, float secondFloat, float by)
         {
             return firstFloat * (1 - by) + secondFloat * by;
@@ -173,6 +173,7 @@ namespace VRC_OSC_AudioEars
                     int versionComparison = localVersion.CompareTo(latestGitHubVersion);
                     if (versionComparison < 0)
                     {
+                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue.Enqueue("An Update is Available!", "Update", async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)),true,true,false,TimeSpan.FromSeconds(15))));
                         Logger.Warn("A new version of VRC-OSC-Audio-Reaction is available!");
                     }
                     else
