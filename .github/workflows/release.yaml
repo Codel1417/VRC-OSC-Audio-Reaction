@@ -37,7 +37,7 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: dotnet publish -c release --self-contained true --os win --force --arch x64 VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj
+      run: dotnet publish -c release --os win --force --arch x64 VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.0.0
       with:
