@@ -54,4 +54,4 @@ jobs:
       uses: yakuhzi/release-asset@v1.2.3
       with:
         # File to upload to the release
-        file: "VRC-OSC-AudioEars\\bin\\release\\net6.0-windows10.0.22000.0\\win-x64\\publish\\"
+        file: "VRC-OSC-AudioEars\\bin\\release\\net6.0-windows10.0.22000.0\\win-x64\\publish\\VRC_OSC_AudioEars.exe"
