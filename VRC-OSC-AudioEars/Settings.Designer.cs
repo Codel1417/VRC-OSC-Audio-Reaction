@@ -85,7 +85,7 @@ namespace VRC_OSC_AudioEars {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enabled {
             get {
                 return ((bool)(this["enabled"]));

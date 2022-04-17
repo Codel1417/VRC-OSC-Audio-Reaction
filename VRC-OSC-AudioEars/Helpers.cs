@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
-using NLog;
+﻿using NLog;
 using NLog.Conditions;
 using NLog.Config;
 using NLog.Targets;
+using NLog.Targets.Wrappers;
 using Octokit;
 using Sentry;
 using Sentry.NLog;
+using System;
+using System.Collections.Generic;
+using System.IO.Compression;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace VRC_OSC_AudioEars
 {
@@ -85,6 +87,14 @@ namespace VRC_OSC_AudioEars
                     o.TracesSampleRate = 0;
                     o.AttachStacktrace = true;
                     o.UseAsyncFileIO = true;
+                    o.ReportAssembliesMode = ReportAssembliesMode.InformationalVersion;
+                    o.DetectStartupTime = StartupTimeDetectionMode.Best;
+                    o.StackTraceMode = StackTraceMode.Enhanced;
+                    o.AddDiagnosticSourceIntegration();
+                    o.RequestBodyCompressionLevel = CompressionLevel.SmallestSize;
+                    o.DecompressionMethods = System.Net.DecompressionMethods.Deflate;
+                    o.EnableScopeSync = true;
+
                 });
                 SentrySdk.ConfigureScope(scope =>
                 {
@@ -132,23 +142,30 @@ namespace VRC_OSC_AudioEars
             consoleTarget.RowHighlightingRules.Add(hightlightDebug);
             consoleTarget.Layout= "${level}: ${message}";
 
-            FileTarget logfile = new("logfile") { FileName = "VRC_OSC_AudioReactuion_Log.txt" };
             
             SentryTarget sentryTarget = new();
             sentryTarget.InitializeSdk = false;
             sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
             DiagnosticListenerTarget diagnosticListenerTarget = new();
             TraceTarget traceTarget = new();
-            config.AddTarget("trace", traceTarget);
-            config.AddTarget("diagnostic",diagnosticListenerTarget);
-            config.AddTarget("console", consoleTarget);
-            config.AddTarget("logfile", logfile);
-            config.AddTarget("sentry", sentryTarget);
-            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, diagnosticListenerTarget);
-            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, consoleTarget);
-            config.AddRule(LogLevel.Trace, LogLevel.Fatal, traceTarget);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, sentryTarget);
+
+            AsyncTargetWrapper asyncTraceTareget = new();
+            asyncTraceTareget.WrappedTarget = traceTarget;
+            AsyncTargetWrapper asyncdiagnosticListenerTarget = new();
+            asyncdiagnosticListenerTarget.WrappedTarget = diagnosticListenerTarget;
+            AsyncTargetWrapper asyncConsoleTarget = new();
+            asyncConsoleTarget.WrappedTarget = consoleTarget;
+            AsyncTargetWrapper asyncSentryTarget = new();
+            asyncSentryTarget.WrappedTarget = sentryTarget;
+
+            config.AddTarget("trace", asyncTraceTareget);
+            config.AddTarget("diagnostic", asyncdiagnosticListenerTarget);
+            config.AddTarget("console", asyncConsoleTarget);
+            config.AddTarget("sentry", asyncSentryTarget);
+            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, asyncdiagnosticListenerTarget);
+            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, asyncConsoleTarget);
+            config.AddRule(LogLevel.Trace, LogLevel.Fatal, asyncTraceTareget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, asyncSentryTarget);
             LogManager.Configuration = config;
         }
 
