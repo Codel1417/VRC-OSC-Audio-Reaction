@@ -24,6 +24,7 @@ public class Audio
         private MMDevice? _device = null;
         private WasapiLoopbackCapture? _capture = null;
         private int _bytesPerSample = 0;
+
         private void OnDataAvailable(object sender, WaveInEventArgs args)
         {
             if (_shouldUpdate)
@@ -84,7 +85,8 @@ public class Audio
             Logger.Trace("Starting capture");
             _capture.StartRecording();
             Logger.Info("Device: " + _device.FriendlyName + " Bitrate: " + _capture.WaveFormat.BitsPerSample + " SampleRate: " + _capture.WaveFormat.SampleRate);
-            
+            Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.DeviceName.Text = _device.DeviceFriendlyName));
+
             Logger.Debug("Configuring Sentry scope");
             
             SentrySdk.ConfigureScope(scope => scope.Contexts["Audio Device"] = new
@@ -104,17 +106,25 @@ public class Audio
                 message: "Audio Set Up " + _device.FriendlyName,
                 category: "Audio",
                 level: BreadcrumbLevel.Info);
-            return Task.CompletedTask;
+
+        OscUtility.SendPort = Settings.Default.port;
+
+        return Task.CompletedTask;
         }
 
         public async Task Update()
         {
             while (true)
             {
+                if (Settings.Default.enabled == false) {
+                    await Task.Delay(25);
+                    continue;
+                }
+
                 try
                 {
-                    _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume, 0.3f);
-                    _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume, 0.3f);
+                    _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume, _leftEarIncomingVolume * Settings.Default.gain, 0.3f);
+                    _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume, _rightEarIncomingVolume * Settings.Default.gain, 0.3f);
                     if (float.IsNaN(_leftEarSmoothedVolume) || float.IsNaN(_rightEarSmoothedVolume) || float.IsInfinity(_leftEarSmoothedVolume) || float.IsInfinity(_rightEarSmoothedVolume))
                     {
                         // handle nan
@@ -123,9 +133,9 @@ public class Audio
                     }
                     _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
                     //log values with fixed decimal places
-                    Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
-                    OscParameter.SendAvatarParameter(Constants.AudioDirectionParameter, _direction);;
-                    OscParameter.SendAvatarParameter(Constants.AudioVolumeParameter, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
+                    //Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
+                    OscParameter.SendAvatarParameter(Settings.Default.audio_direction, _direction);;
+                    OscParameter.SendAvatarParameter(Settings.Default.audio_volume, (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
                 }
                 catch (Exception e)
                 {
@@ -135,10 +145,16 @@ public class Audio
                     await Task.Delay(2000);
                 }
 
-
+                UpdateUI();
                 await Task.Delay(25);
                 _shouldUpdate = true;
 
             }
         }
+    public void UpdateUI()
+    {
+        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.LeftAudioMeter.Value = _leftEarSmoothedVolume));
+        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.RightAudioMeter.Value = _rightEarSmoothedVolume));
+
+    }
 }

@@ -1,20 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
-using NLog;
+﻿using NLog;
 using NLog.Conditions;
 using NLog.Config;
 using NLog.Targets;
+using NLog.Targets.Wrappers;
 using Octokit;
 using Sentry;
 using Sentry.NLog;
+using System;
+using System.Collections.Generic;
+using System.IO.Compression;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace VRC_OSC_AudioEars
 {
     public static class Helpers
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        public static MainWindow? mainWindow;
 
         /// <summary>
         /// Linear interpolation between two values.
@@ -23,6 +26,7 @@ namespace VRC_OSC_AudioEars
         /// <param name="secondFloat">The Right Value (1)</param>
         /// <param name="by">Lerp Point</param>
         /// <returns></returns>
+        /// 
         public static float Lerp(float firstFloat, float secondFloat, float by)
         {
             return firstFloat * (1 - by) + secondFloat * by;
@@ -77,10 +81,20 @@ namespace VRC_OSC_AudioEars
             try {
                 SentrySdk.Init(o  =>
                 {
-                    o.Dsn = "https://c39539385af440b2854d2d558c4d8d82@o1187002.ingest.sentry.io/6307588";
+                    o.Dsn = Constants.SENTRY_DSN;
                     o.Environment = IsDebugBuild ? "Debug" : "Release";
                     o.Debug = IsDebugBuild;
                     o.TracesSampleRate = 0;
+                    o.AttachStacktrace = true;
+                    o.UseAsyncFileIO = true;
+                    o.ReportAssembliesMode = ReportAssembliesMode.InformationalVersion;
+                    o.DetectStartupTime = StartupTimeDetectionMode.Best;
+                    o.StackTraceMode = StackTraceMode.Enhanced;
+                    o.AddDiagnosticSourceIntegration();
+                    o.RequestBodyCompressionLevel = CompressionLevel.SmallestSize;
+                    o.DecompressionMethods = System.Net.DecompressionMethods.Deflate;
+                    o.EnableScopeSync = true;
+
                 });
                 SentrySdk.ConfigureScope(scope =>
                 {
@@ -128,18 +142,30 @@ namespace VRC_OSC_AudioEars
             consoleTarget.RowHighlightingRules.Add(hightlightDebug);
             consoleTarget.Layout= "${level}: ${message}";
 
-            FileTarget logfile = new("logfile") { FileName = "VRC_OSC_AudioReactuion_Log.txt" };
             
             SentryTarget sentryTarget = new();
             sentryTarget.InitializeSdk = false;
             sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
-            
-            config.AddTarget("console", consoleTarget);
-            config.AddTarget("logfile", logfile);
-            config.AddTarget("sentry", sentryTarget);
-            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, consoleTarget);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, sentryTarget);
+            DiagnosticListenerTarget diagnosticListenerTarget = new();
+            TraceTarget traceTarget = new();
+
+            AsyncTargetWrapper asyncTraceTareget = new();
+            asyncTraceTareget.WrappedTarget = traceTarget;
+            AsyncTargetWrapper asyncdiagnosticListenerTarget = new();
+            asyncdiagnosticListenerTarget.WrappedTarget = diagnosticListenerTarget;
+            AsyncTargetWrapper asyncConsoleTarget = new();
+            asyncConsoleTarget.WrappedTarget = consoleTarget;
+            AsyncTargetWrapper asyncSentryTarget = new();
+            asyncSentryTarget.WrappedTarget = sentryTarget;
+
+            config.AddTarget("trace", asyncTraceTareget);
+            config.AddTarget("diagnostic", asyncdiagnosticListenerTarget);
+            config.AddTarget("console", asyncConsoleTarget);
+            config.AddTarget("sentry", asyncSentryTarget);
+            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, asyncdiagnosticListenerTarget);
+            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, asyncConsoleTarget);
+            config.AddRule(LogLevel.Trace, LogLevel.Fatal, asyncTraceTareget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, asyncSentryTarget);
             LogManager.Configuration = config;
         }
 
@@ -150,10 +176,10 @@ namespace VRC_OSC_AudioEars
             try
             {
                 Logger.Trace("Setting up github client");
-                GitHubClient client = new GitHubClient(new ProductHeaderValue("VRC-OSC-Audio-Reaction"));
+                GitHubClient client = new GitHubClient(new ProductHeaderValue(Constants.project_name));
                 Logger.Trace("Getting latest release");
                 IReadOnlyList<Release> releases =
-                    await client.Repository.Release.GetAll("Codel1417", "VRC-OSC-Audio-Reaction");
+                    await client.Repository.Release.GetAll(Constants.project_user,Constants.project_name);
                 if (Helpers.AssemblyProductVersion != "" && releases.Count > 0)
                 {
                     Logger.Trace("Getting latest release version");
@@ -164,6 +190,7 @@ namespace VRC_OSC_AudioEars
                     int versionComparison = localVersion.CompareTo(latestGitHubVersion);
                     if (versionComparison < 0)
                     {
+                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue?.Enqueue("An Update is Available!", "Update", async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)),true,true,false,TimeSpan.FromSeconds(15))));
                         Logger.Warn("A new version of VRC-OSC-Audio-Reaction is available!");
                     }
                     else
@@ -183,5 +210,6 @@ namespace VRC_OSC_AudioEars
 
             Logger.Trace("Ending check for updates");
         }
+
     }
 }

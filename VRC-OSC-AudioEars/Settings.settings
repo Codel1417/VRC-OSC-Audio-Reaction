@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="VRC_OSC_AudioEars" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="audio_direction" Type="System.String" Scope="User">
+      <Value Profile="(Default)">audio_direction</Value>
+    </Setting>
+    <Setting Name="audio_volume" Type="System.String" Scope="User">
+      <Value Profile="(Default)">audio_volume</Value>
+    </Setting>
+    <Setting Name="gain" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="error_reporting" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">9000</Value>
+    </Setting>
+    <Setting Name="enabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
