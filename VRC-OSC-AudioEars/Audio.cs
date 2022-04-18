@@ -85,7 +85,7 @@ public class Audio
             Logger.Trace("Starting capture");
             _capture.StartRecording();
             Logger.Info("Device: " + _device.FriendlyName + " Bitrate: " + _capture.WaveFormat.BitsPerSample + " SampleRate: " + _capture.WaveFormat.SampleRate);
-            Helpers.mainWindow.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.deviceName.Text = _device.DeviceFriendlyName));
+            Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.DeviceName.Text = _device.DeviceFriendlyName));
 
             Logger.Debug("Configuring Sentry scope");
             
@@ -153,8 +153,8 @@ public class Audio
         }
     public void UpdateUI()
     {
-        Helpers.mainWindow.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.leftAudioMeter.Value = _leftEarSmoothedVolume));
-        Helpers.mainWindow.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.rightAudioMeter.Value = _rightEarSmoothedVolume));
+        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.LeftAudioMeter.Value = _leftEarSmoothedVolume));
+        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() => Helpers.mainWindow.RightAudioMeter.Value = _rightEarSmoothedVolume));
 
     }
 }

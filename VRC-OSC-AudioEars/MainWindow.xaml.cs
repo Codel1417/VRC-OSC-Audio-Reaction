@@ -15,6 +15,7 @@ namespace VRC_OSC_AudioEars
         public Audio audio = new();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Runs in background")]
         private readonly WindowColor windowColor = new();
+        public String WindowTitle = "VRC OSC Audio Ears" + Helpers.AssemblyProductVersion;
         public MainWindow()
         {
             Helpers.mainWindow = this;
@@ -30,7 +31,7 @@ namespace VRC_OSC_AudioEars
             await Helpers.CheckGitHubNewerVersion().ConfigureAwait(false); // Don't wait for it
             await audio.SetUpAudio().ConfigureAwait(false);
             await audio.Update().ConfigureAwait(false);
-            return;
+            this.Title = $" - {Helpers.AssemblyProductVersion}";
         }
 
         private void Window_Closed(object sender, EventArgs e) => Environment.Exit(0);
@@ -58,6 +59,21 @@ namespace VRC_OSC_AudioEars
             {
                 SnackBar.MessageQueue.Enqueue("Settings Reset!");
             }
+        }
+
+        private void settingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Transitioner.SelectedIndex = 1;
+        }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            Transitioner.SelectedIndex = 0;
+        }
+
+        private void aboutButton_Click(object sender, RoutedEventArgs e)
+        {
+            Transitioner.SelectedIndex = 2;
         }
     }
 }
