@@ -43,7 +43,7 @@
 	    <SignAssembly>False</SignAssembly>
 </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
         <PackageReference Include="MaterialDesignColors" Version="2.0.5" />
         <PackageReference Include="MaterialDesignThemes" Version="4.4.0" />
         <PackageReference Include="MaterialDesignThemes.Wpf" Version="1.0.1" />
