@@ -45,7 +45,7 @@
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
         <PackageReference Include="MaterialDesignColors" Version="2.0.5" />
-        <PackageReference Include="MaterialDesignThemes" Version="4.4.0" />
+        <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
         <PackageReference Include="MaterialDesignThemes.Wpf" Version="1.0.1" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
