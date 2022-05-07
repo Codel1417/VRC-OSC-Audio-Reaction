@@ -2,7 +2,11 @@
 
 This application takes the audio from your default audio output device and then sends the OSC parameters for direction and amplitude.
 
-## Video
+![image](https://user-images.githubusercontent.com/13484789/163749591-744f2bbc-eb4c-47f1-9a87-bbb83329b92e.png)
+![image](https://user-images.githubusercontent.com/13484789/163749600-4b68d209-3fd8-4c42-8efb-e49c70f99615.png)
+
+
+## In Action
 [![Video Demo](http://img.youtube.com/vi/nRYSYIVfluI/0.jpg)](http://www.youtube.com/watch?v=nRYSYIVfluI)
 
 
