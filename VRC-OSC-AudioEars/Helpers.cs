@@ -69,7 +69,7 @@ namespace VRC_OSC_AudioEars
             get
             {
 #if DEBUG
-                    return true;
+                return true;
 #else
                 return false;
 #endif
@@ -78,8 +78,9 @@ namespace VRC_OSC_AudioEars
 
         public static Task InitSentry()
         {
-            try {
-                SentrySdk.Init(o  =>
+            try
+            {
+                SentrySdk.Init(o =>
                 {
                     o.Dsn = Constants.SENTRY_DSN;
                     o.Environment = IsDebugBuild ? "Debug" : "Release";
@@ -106,7 +107,7 @@ namespace VRC_OSC_AudioEars
             catch (Exception e)
             {
                 Logger.Error(e, "Failed to initialize Sentry");
-            } 
+            }
             Logger.Info(SentrySdk.IsEnabled ? "Sentry is enabled" : "Sentry is disabled");
             return Task.CompletedTask;
         }
@@ -140,9 +141,9 @@ namespace VRC_OSC_AudioEars
                 ForegroundColor = ConsoleOutputColor.Gray
             };
             consoleTarget.RowHighlightingRules.Add(hightlightDebug);
-            consoleTarget.Layout= "${level}: ${message}";
+            consoleTarget.Layout = "${level}: ${message}";
 
-            
+
             SentryTarget sentryTarget = new();
             sentryTarget.InitializeSdk = false;
             sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
@@ -179,7 +180,7 @@ namespace VRC_OSC_AudioEars
                 GitHubClient client = new GitHubClient(new ProductHeaderValue(Constants.project_name));
                 Logger.Trace("Getting latest release");
                 IReadOnlyList<Release> releases =
-                    await client.Repository.Release.GetAll(Constants.project_user,Constants.project_name);
+                    await client.Repository.Release.GetAll(Constants.project_user, Constants.project_name);
                 if (Helpers.AssemblyProductVersion != "" && releases.Count > 0)
                 {
                     Logger.Trace("Getting latest release version");
@@ -190,7 +191,7 @@ namespace VRC_OSC_AudioEars
                     int versionComparison = localVersion.CompareTo(latestGitHubVersion);
                     if (versionComparison < 0)
                     {
-                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue?.Enqueue("An Update is Available!", "Update", async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)),true,true,false,TimeSpan.FromSeconds(15))));
+                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue?.Enqueue("An Update is Available!", "Update", async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)), true, true, false, TimeSpan.FromSeconds(15))));
                         Logger.Warn("A new version of VRC-OSC-Audio-Reaction is available!");
                     }
                     else

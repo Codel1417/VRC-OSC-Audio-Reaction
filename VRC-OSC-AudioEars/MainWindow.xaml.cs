@@ -12,7 +12,7 @@ namespace VRC_OSC_AudioEars
     public partial class MainWindow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public Audio audio = new();
+        public Audio audio = Audio.Instance;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Runs in background")]
         private readonly WindowColor windowColor = new();
         public String WindowTitle = "VRC OSC Audio Ears" + Helpers.AssemblyProductVersion;
@@ -29,8 +29,7 @@ namespace VRC_OSC_AudioEars
             //Load settings
             if (Settings.Default.error_reporting) await Helpers.InitSentry();
             await Helpers.CheckGitHubNewerVersion().ConfigureAwait(false); // Don't wait for it
-            await audio.SetUpAudio().ConfigureAwait(false);
-            await audio.Update().ConfigureAwait(false);
+            await audio.Update().ConfigureAwait(false);// main update loop
             this.Title = $" - {Helpers.AssemblyProductVersion}";
         }
 
@@ -74,6 +73,26 @@ namespace VRC_OSC_AudioEars
         private void aboutButton_Click(object sender, RoutedEventArgs e)
         {
             Transitioner.SelectedIndex = 2;
+        }
+
+        private void DeviceName_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs? e)
+        {
+            if (DeviceName != null && DeviceName.SelectedItem != null)
+            {
+                audio.SetUpAudio((string)DeviceName.SelectedItem, DeviceName);
+            }
+        }
+
+        private void DeviceName_Initialized(object sender, EventArgs e)
+        {
+            DeviceName = audio.UpdateUIDeviceList(DeviceName);
+            DeviceName.InvalidateVisual();
+            DeviceName.UpdateLayout();
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            DeviceName_SelectionChanged(sender, null);
         }
     }
 }
