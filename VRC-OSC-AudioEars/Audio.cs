@@ -13,16 +13,16 @@ namespace VRC_OSC_AudioEars;
 public class Audio
 {
     private Audio() { }
-    private static Audio instance = null;
+    private static Audio _instance = null;
     public static Audio Instance
     {
         get
         {
-            if (instance == null)
+            if (_instance == null)
             {
-                instance = new Audio();
+                _instance = new Audio();
             }
-            return instance;
+            return _instance;
         }
     }
 
@@ -41,6 +41,8 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private WasapiLoopbackCapture? _capture = null;
     private int _bytesPerSample = 0;
     public MMDeviceCollection? devices = null;
+    public bool IsDefaultCurrent = true;
+    
     private void OnDataAvailable(object sender, WaveInEventArgs args)
     {
         if (_shouldUpdate)
@@ -80,7 +82,22 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
             _rightEarIncomingVolume *= 10;
         }
     }
-    public ComboBox UpdateUIDeviceList(ComboBox combobox)
+
+    public bool isDefaultDevice(ComboBox? comboBox)
+    {
+        MMDevice defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+        return comboBox.SelectedIndex == comboBox.Items.IndexOf(defaultDevice.FriendlyName);
+    }
+
+    public void UpdateDefaultDevice(ComboBox? comboBox)
+    {
+        MMDevice defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+        Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
+        comboBox.SelectedIndex = comboBox.Items.IndexOf(defaultDevice.FriendlyName);
+        IsDefaultCurrent = true;
+    }
+
+    public ComboBox? UpdateUIDeviceList(ComboBox? combobox)
     {
         Logger.Debug("Updating UI device list");
         combobox.Items.Clear();
@@ -96,6 +113,7 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         {
             Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
             combobox.SelectedIndex = combobox.Items.IndexOf(defaultDevice.FriendlyName);
+            IsDefaultCurrent = true;
         }
         return combobox;
     }
@@ -109,7 +127,7 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         }
         return mMDevices;
     }
-    public MMDevice? GetSelectedDevice(string selectedItem, ComboBox comboBox)
+    public MMDevice? GetSelectedDevice(string? selectedItem, ComboBox? comboBox)
     {
         Logger.Info("Getting selected device: " + selectedItem);
         if (selectedItem != null )
@@ -118,16 +136,25 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
             {
                 if (device != null && device.FriendlyName.Equals(selectedItem) && device.State == DeviceState.Active)
                 {
-                    Logger.Debug("Found matching device: ", device.FriendlyName);
+                    Logger.Debug("Found matching device: " + device.FriendlyName);
+                    IsDefaultCurrent = isDefaultDevice(comboBox);
                     return device;
                 }
             }
+            UpdateDefaultDevice(comboBox);
+            return enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
         }
         return null;
     }
 
-    public Task SetUpAudio(String selectedItem, ComboBox comboBox)
+    private bool _registerListener = false;
+    public Task SetUpAudio(string? selectedItem, ComboBox? comboBox)
     {
+        if (!_registerListener)
+        {
+            enumerator.RegisterEndpointNotificationCallback(new AudioEventListener());
+            _registerListener = true;
+        }
         MMDevice? newDevice = GetSelectedDevice(selectedItem, comboBox);
         try
         {
