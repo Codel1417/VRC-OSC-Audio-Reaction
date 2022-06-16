@@ -56,7 +56,7 @@
         <PackageReference Include="Octokit" Version="0.51.0" />
         <PackageReference Include="Sentry" Version="3.17.1" />
         <PackageReference Include="Sentry.DiagnosticSource" Version="3.17.1" />
-        <PackageReference Include="Sentry.NLog" Version="3.17.1" />
+        <PackageReference Include="Sentry.NLog" Version="3.18.0" />
         <PackageReference Include="System.Collections" Version="4.3.0" />
         <PackageReference Include="VRCOscLib" Version="1.1.3" />
     </ItemGroup>
