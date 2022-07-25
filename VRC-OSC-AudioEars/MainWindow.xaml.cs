@@ -3,6 +3,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using VRC_OSC_AudioEars.Properties;
 
 namespace VRC_OSC_AudioEars
 {
@@ -86,8 +87,11 @@ namespace VRC_OSC_AudioEars
         private void DeviceName_Initialized(object sender, EventArgs e)
         {
             DeviceName = audio.UpdateUIDeviceList(DeviceName);
-            DeviceName.InvalidateVisual();
-            DeviceName.UpdateLayout();
+            if (DeviceName != null)
+            {
+                DeviceName.InvalidateVisual();
+                DeviceName.UpdateLayout();
+            }
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

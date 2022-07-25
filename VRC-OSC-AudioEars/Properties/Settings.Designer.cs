@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace VRC_OSC_AudioEars {
+namespace VRC_OSC_AudioEars.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

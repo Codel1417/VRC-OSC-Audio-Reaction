@@ -5,15 +5,17 @@ using NLog;
 using Sentry;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using VRC_OSC_AudioEars.Properties;
 
 namespace VRC_OSC_AudioEars;
 
 public class Audio
 {
     private Audio() { }
-    private static Audio _instance = null;
+    private static Audio? _instance = null;
     public static Audio Instance
     {
         get
@@ -36,11 +38,10 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private float _leftEarIncomingVolume = 0;
     private float _rightEarIncomingVolume = 0;
     private float _direction = 0;
-    private MMDeviceEnumerator enumerator = new();
+    private readonly MMDeviceEnumerator enumerator = new();
     public MMDevice? _activeDevice = null;
     private WasapiLoopbackCapture? _capture = null;
     private int _bytesPerSample = 0;
-    public MMDeviceCollection? devices = null;
     public bool IsDefaultCurrent = true;
     
     private void OnDataAvailable(object sender, WaveInEventArgs args)
@@ -83,37 +84,47 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         }
     }
 
-    public bool isDefaultDevice(ComboBox? comboBox)
+    public bool IsDefaultDevice(ComboBox? comboBox)
     {
         MMDevice defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-        return comboBox.SelectedIndex == comboBox.Items.IndexOf(defaultDevice.FriendlyName);
+        if (comboBox != null)
+        {
+            return comboBox.SelectedIndex == comboBox.Items.IndexOf(defaultDevice.FriendlyName);
+        }
+        return false;
     }
 
     public void UpdateDefaultDevice(ComboBox? comboBox)
     {
         MMDevice defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
         Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
-        comboBox.SelectedIndex = comboBox.Items.IndexOf(defaultDevice.FriendlyName);
-        IsDefaultCurrent = true;
+        if (comboBox != null)
+        {
+            comboBox.SelectedIndex = comboBox.Items.IndexOf(defaultDevice.FriendlyName);
+            IsDefaultCurrent = true;
+        }
     }
 
     public ComboBox? UpdateUIDeviceList(ComboBox? combobox)
     {
         Logger.Debug("Updating UI device list");
-        combobox.Items.Clear();
-        List<MMDevice> devices = GetDeviceList();
-        MMDevice defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-        foreach (var wasapi in devices)
+        if (combobox != null)
         {
-            string name = wasapi.FriendlyName;
-            //Logger.Debug("Device: " + name);
-            combobox.Items.Add(name);
-        }
-        if (combobox.SelectedIndex == -1)
-        {
-            Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
-            combobox.SelectedIndex = combobox.Items.IndexOf(defaultDevice.FriendlyName);
-            IsDefaultCurrent = true;
+            combobox.Items.Clear();
+            List<MMDevice> devices = GetDeviceList();
+            MMDevice defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+            foreach (var wasapi in devices)
+            {
+                string name = wasapi.FriendlyName;
+                //Logger.Debug("Device: " + name);
+                combobox.Items.Add(name);
+            }
+            if (combobox.SelectedIndex == -1)
+            {
+                Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
+                combobox.SelectedIndex = combobox.Items.IndexOf(defaultDevice.FriendlyName);
+                IsDefaultCurrent = true;
+            }
         }
         return combobox;
     }
@@ -123,6 +134,7 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         List<MMDevice> mMDevices = new();
         foreach (var wasapi in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
         {
+            if (wasapi != null)
             mMDevices.Add(wasapi);
         }
         return mMDevices;
@@ -137,12 +149,12 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
                 if (device != null && device.FriendlyName.Equals(selectedItem) && device.State == DeviceState.Active)
                 {
                     Logger.Debug("Found matching device: " + device.FriendlyName);
-                    IsDefaultCurrent = isDefaultDevice(comboBox);
+                    IsDefaultCurrent = IsDefaultDevice(comboBox);
                     return device;
                 }
             }
             UpdateDefaultDevice(comboBox);
-            return enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+            return enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
         }
         return null;
     }
@@ -152,7 +164,8 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     {
         if (!_registerListener)
         {
-            enumerator.RegisterEndpointNotificationCallback(new AudioEventListener());
+            //Causes crash when switching device, not the handling just registering the callback :/
+            //enumerator.RegisterEndpointNotificationCallback(new AudioEventListener());
             _registerListener = true;
         }
         MMDevice? newDevice = GetSelectedDevice(selectedItem, comboBox);
@@ -168,6 +181,8 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
             if (_capture != null) _capture.StopRecording();
             if (_capture != null) _capture.Dispose();
+            if (_capture != null) _capture.DataAvailable -= OnDataAvailable;
+            _capture = null;
             if (_activeDevice != null) _activeDevice.Dispose();
             _activeDevice = newDevice;
             if (_activeDevice != null)
@@ -197,7 +212,9 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
                 });;
 
                 Logger.Trace("Starting capture");
+
                 _capture.StartRecording();
+                Logger.Trace("Started capture");
 
                 SentrySdk.AddBreadcrumb(
                     message: "Audio Set Up " + _activeDevice.FriendlyName,

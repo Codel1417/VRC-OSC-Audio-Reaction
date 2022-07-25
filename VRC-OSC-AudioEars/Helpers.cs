@@ -41,7 +41,7 @@ namespace VRC_OSC_AudioEars
         {
             return value switch
             {
-                < 0.01f => 0.01f,
+                < 0.005f => 0.005f,
                 > 1f => 1f,
                 _ => value
             };

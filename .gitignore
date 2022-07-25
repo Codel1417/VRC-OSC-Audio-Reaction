@@ -4,6 +4,7 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 .idea/
+.vs/
 VRC-OSC-AudioEars.sln.DotSettings.user
 
 .vs/VRC-OSC-AudioEars/v17/.suo
@@ -11,3 +12,7 @@ VRC-OSC-AudioEars.sln.DotSettings.user
 .vs/VRC-OSC-AudioEars/v17/.futdcache.v1
 
 .vs/VRC-OSC-AudioEars/DesignTimeBuild/.dtbcache.v2
+
+VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj.user
+
+VRC-OSC-AudioEars/VRC-OSC-AudioEars - Backup.csproj
