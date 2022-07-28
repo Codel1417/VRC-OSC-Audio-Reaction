@@ -60,25 +60,10 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
                     _rightRaw += Math.Abs(BitConverter.ToSingle(args.Buffer, i + _bytesPerSample));
                 }
             }
-            else if (_bytesPerSample == 2)
-            {
-                for (int i = 0; i < args.BytesRecorded; i += _bytesPerSample * 2)
-                {
-                    _leftRaw += Math.Abs(BitConverter.ToInt16(args.Buffer, i));
-                    _rightRaw += Math.Abs(BitConverter.ToInt16(args.Buffer, i + _bytesPerSample));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < args.BytesRecorded; i += _bytesPerSample)
-                {
-                    _leftRaw += Math.Abs(BitConverter.ToInt32(args.Buffer, i));
-                    _rightRaw += Math.Abs(BitConverter.ToInt32(args.Buffer, i + _bytesPerSample));
-                }
-            }
             _leftEarIncomingVolume = _leftRaw / (args.BytesRecorded / _bytesPerSample);
             _rightEarIncomingVolume = _rightRaw / (args.BytesRecorded / _bytesPerSample);
 
+            // Boost volume to usable level
             _leftEarIncomingVolume *= 10;
             _rightEarIncomingVolume *= 10;
         }
@@ -191,6 +176,7 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
                 _capture = new WasapiLoopbackCapture(_activeDevice);
                 Logger.Trace("Setting up Event listeners");
                 _capture.DataAvailable += OnDataAvailable!;
+                _capture.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2); // Use a consistent format for processing audio
                 _bytesPerSample = _capture.WaveFormat.BitsPerSample / _capture.WaveFormat.BlockAlign;
 
 
