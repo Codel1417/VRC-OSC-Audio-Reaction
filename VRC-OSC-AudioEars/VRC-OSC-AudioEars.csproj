@@ -19,7 +19,7 @@
         <PublishReadyToRun>true</PublishReadyToRun>
         <PublishProfile>Release</PublishProfile>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <AssemblyVersion>0.2.2</AssemblyVersion>
         <FileVersion>$(AssemblyVersion)</FileVersion>
         <InformationalVersion>$(AssemblyVersion)</InformationalVersion>
         <ProductVersion>$(AssemblyVersion)</ProductVersion>
