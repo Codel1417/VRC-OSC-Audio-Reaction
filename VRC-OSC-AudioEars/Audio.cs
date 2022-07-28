@@ -176,25 +176,18 @@ private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
                 _capture = new WasapiLoopbackCapture(_activeDevice);
                 Logger.Trace("Setting up Event listeners");
                 _capture.DataAvailable += OnDataAvailable!;
-                _capture.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2); // Use a consistent format for processing audio
+                _capture.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(48000, 2); // Use a consistent format for processing audio
                 _bytesPerSample = _capture.WaveFormat.BitsPerSample / _capture.WaveFormat.BlockAlign;
 
 
                 Logger.Debug("Configuring Sentry scope");
-                Logger.Info("Device: " + _activeDevice.FriendlyName + " Bitrate: " + _capture.WaveFormat.BitsPerSample + " SampleRate: " + _capture.WaveFormat.SampleRate + " Dataflow: " + _activeDevice.DataFlow);
                 SentrySdk.ConfigureScope(scope => scope.Contexts["Audio Device"] = new
                 {
                     _activeDevice.FriendlyName,
-                    _capture.WaveFormat.BitsPerSample,
-                    _capture.WaveFormat.SampleRate,
-                    _capture.WaveFormat.Channels,
-                    Encoding = _capture.WaveFormat.Encoding.ToString(),
                     CaptureState = _capture.CaptureState.ToString(),
                     ShareMode = _capture.ShareMode.ToString(),
-                    _capture.WaveFormat.BlockAlign,
                     _capture.WaveFormat.AverageBytesPerSecond,
                     DeviceState = _activeDevice.State.ToString(),
-                    _activeDevice.DataFlow,
                 });;
 
                 Logger.Trace("Starting capture");
