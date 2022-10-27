@@ -67,6 +67,10 @@
     <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
     <PackageReference Include="MaterialDesignThemes.Wpf" Version="1.0.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="NAudio.Core" Version="2.1.0" />
     <PackageReference Include="NAudio.Wasapi" Version="2.1.0" />
     <PackageReference Include="NLog" Version="5.0.2" />
@@ -78,8 +82,6 @@
     <PackageReference Include="Sentry.NLog" Version="3.20.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="VRCOscLib" Version="1.2.1" />
-    <PackageReference Include="WiX" Version="3.11.2" />
-    <PackageReference Include="WiX.Toolset" Version="3.9.1208" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

@@ -7,34 +7,32 @@ namespace VRC_OSC_AudioEars;
 
 class AudioEventListener : IMMNotificationClient
 {
-    private ComboBox? _comboBox;
 
     public void OnDeviceStateChanged(string deviceId, DeviceState newState)
     {
-        Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => _comboBox = Helpers.mainWindow.DeviceName));
-        Audio.Instance.UpdateUIDeviceList(_comboBox);
+        Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
     }
 
     public void OnDeviceAdded(string pwstrDeviceId)
     {
-        Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => _comboBox = Helpers.mainWindow.DeviceName));
-        Audio.Instance.UpdateUIDeviceList(_comboBox);
+        Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
     }
 
     public void OnDeviceRemoved(string deviceId)
     {
-        Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => _comboBox = Helpers.mainWindow.DeviceName));
-        Audio.Instance.UpdateUIDeviceList(_comboBox);
+        Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
     }
 
     public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
     {
-        Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => _comboBox = Helpers.mainWindow.DeviceName));
-
         if (Audio.Instance.IsDefaultCurrent)
-        {
-            Audio.Instance.UpdateDefaultDevice(_comboBox);
-            Audio.Instance.SetUpAudio((string)_comboBox?.SelectedItem!, _comboBox);
+        {       
+            String deviceName = null;
+            Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => deviceName = (string) Helpers.mainWindow.DeviceName.SelectedItem));
+
+            //Audio.Instance.UpdateDefaultDevice();
+            Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
+            Audio.Queue.Enqueue(() => Audio.Instance.SetUpAudio(deviceName));
         }
     }
 

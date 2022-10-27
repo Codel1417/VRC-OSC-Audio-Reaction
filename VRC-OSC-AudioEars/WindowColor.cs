@@ -10,23 +10,25 @@ namespace VRC_OSC_AudioEars
     internal class WindowColor
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly UISettings _uiSettings = new();
 
         public WindowColor()
         {
             Logger.Debug("Setting up windows color watcher");
-            UISettings? uiSettings = new();
-            uiSettings.ColorValuesChanged += UiSettings_ColorValuesChanged;
-            SetWindowsColors(uiSettings);
+            _uiSettings.ColorValuesChanged += UiSettings_ColorValuesChanged;
+            
+            SetWindowsColors(_uiSettings);
         }
 
         private void UiSettings_ColorValuesChanged(UISettings sender, object args)
         {
 
             Logger.Info("Windows theme updated");
-            SetWindowsColors(sender);
+            Helpers.mainWindow?.Dispatcher.Invoke(() =>
+                SetWindowsColors(sender));
         }
 
-        public static void SetWindowsColors(UISettings uiSettings)
+        private static void SetWindowsColors(UISettings uiSettings)
         {
             try
             {
@@ -35,6 +37,7 @@ namespace VRC_OSC_AudioEars
                 Windows.UI.Color backGround = uiSettings.GetColorValue(UIColorType.Background);
                 System.Windows.Media.Color newColor = System.Windows.Media.Color.FromArgb(accentColor.A, accentColor.R, accentColor.G, accentColor.B);
                 var resources = System.Windows.Application.Current.Resources.MergedDictionaries;
+                
                 CustomColorTheme theme = (CustomColorTheme)System.Windows.Application.Current.Resources.MergedDictionaries.OfType<CustomColorTheme>().First<CustomColorTheme>();
                 theme.PrimaryColor = newColor;
                 theme.SecondaryColor = newColor;

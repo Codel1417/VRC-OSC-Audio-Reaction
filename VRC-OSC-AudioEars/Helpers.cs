@@ -181,7 +181,7 @@ namespace VRC_OSC_AudioEars
                 Logger.Trace("Getting latest release");
                 IReadOnlyList<Release> releases =
                     await client.Repository.Release.GetAll(Constants.project_user, Constants.project_name);
-                if (Helpers.AssemblyProductVersion != "" && releases.Count > 0)
+                if (AssemblyProductVersion != "" && releases.Count > 0)
                 {
                     Logger.Trace("Getting latest release version");
                     Version latestGitHubVersion = new(releases[0].TagName);
