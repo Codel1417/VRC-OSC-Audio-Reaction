@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Controls;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 
@@ -27,10 +26,8 @@ class AudioEventListener : IMMNotificationClient
     {
         if (Audio.Instance.IsDefaultCurrent)
         {       
-            String deviceName = null;
+            string deviceName = "";
             Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => deviceName = (string) Helpers.mainWindow.DeviceName.SelectedItem));
-
-            //Audio.Instance.UpdateDefaultDevice();
             Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
             Audio.Queue.Enqueue(() => Audio.Instance.SetUpAudio(deviceName));
         }

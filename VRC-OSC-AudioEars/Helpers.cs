@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Reflection;
 using System.Threading.Tasks;
+using VRC_OSC_AudioEars.Properties;
 
 namespace VRC_OSC_AudioEars
 {
@@ -191,7 +192,7 @@ namespace VRC_OSC_AudioEars
                     int versionComparison = localVersion.CompareTo(latestGitHubVersion);
                     if (versionComparison < 0)
                     {
-                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue?.Enqueue("An Update is Available!", "Update", async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)), true, true, false, TimeSpan.FromSeconds(15))));
+                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue?.Enqueue(Strings.updateMessage, Strings.updateGo, async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)), true, true, false, TimeSpan.FromSeconds(15))));
                         Logger.Warn("A new version of VRC-OSC-Audio-Reaction is available!");
                     }
                     else

@@ -54,7 +54,7 @@ public class Audio
     private MMDevice? _activeDevice;
     private WasapiLoopbackCapture? _capture;
     private int _bytesPerSample;
-    public bool IsDefaultCurrent = true;
+    public bool IsDefaultCurrent { get; private set; } = true;
 
     private void OnDataAvailable(object? sender, WaveInEventArgs args)
     {
@@ -123,7 +123,6 @@ public class Audio
             {
                 Helpers.mainWindow?.Dispatcher.Invoke(() =>
                     Helpers.mainWindow.DeviceName.Items.Add(name));
-                ;
             }
 
             int index = -1;
@@ -210,7 +209,7 @@ public class Audio
                 _capture = new WasapiLoopbackCapture(_activeDevice);
                 if (_activeDevice.AudioEndpointVolume.HardwareSupport == 0)
                 {
-                    throw new Exception("Selected device does not support capturing"); // covers up crash when virtual audio device is selected
+                    throw new NotSupportedException("Selected device does not support capturing"); // covers up crash when virtual audio device is selected
                 }
                 Logger.Trace("Setting up Event listeners");
                 _capture.DataAvailable += OnDataAvailable;
@@ -228,7 +227,7 @@ public class Audio
                     _capture.WaveFormat.AverageBytesPerSecond,
                     DeviceState = _activeDevice.State.ToString(),
                 });
-                ;
+                
 
                 Logger.Trace("Starting capture");
 
@@ -247,11 +246,9 @@ public class Audio
         {
             Logger.Error(ex);
             SentrySdk.CaptureException(ex);
-            if (Helpers.mainWindow != null && Helpers.mainWindow.SnackBar.MessageQueue != null)
-            {
-                Helpers.mainWindow?.Dispatcher.InvokeAsync(() =>
-                    Helpers.mainWindow.SnackBar.MessageQueue.Enqueue("Unable to use selected device!"));
-            }
+            Helpers.mainWindow?.Dispatcher.InvokeAsync(() =>
+                    Helpers.mainWindow.SnackBar.MessageQueue?.Enqueue(Strings.deviceError));
+            
 
             Settings.Default.enabled = false;
         }
@@ -261,7 +258,7 @@ public class Audio
     {
         while (true)
         {
-            if (Settings.Default.enabled == false)
+            if (!Settings.Default.enabled)
             {
                 await Task.Delay(25);
                 continue;
@@ -286,9 +283,7 @@ public class Audio
 
                 _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
                 //log values with fixed decimal places
-                //Logger.Trace($"Left Ear: {_leftEarSmoothedVolume:F3} Right Ear: {_rightEarSmoothedVolume:F3} Direction: {_direction:F3}");
                 OscParameter.SendAvatarParameter(Settings.Default.audio_direction, _direction);
-                ;
                 OscParameter.SendAvatarParameter(Settings.Default.audio_volume,
                     (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
             }

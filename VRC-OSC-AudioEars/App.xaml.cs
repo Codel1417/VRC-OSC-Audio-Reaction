@@ -4,6 +4,8 @@ using Sentry;
 using System.Windows;
 using System.Windows.Threading;
 using NLog;
+using System.IO;
+using System;
 
 namespace VRC_OSC_AudioEars
 {
@@ -39,6 +41,36 @@ namespace VRC_OSC_AudioEars
             SentrySdk.CaptureException(e.Exception);
 
             e.Handled = true;
+        }
+        /// <summary>
+        /// Sets or replaces the ResourceDictionary by dynamically loading
+        /// a Localization ResourceDictionary from the file path passed in.
+        /// </summary>
+        /// <param name="resourceDictionaryFile">The resource dictionary to use to set/replace
+        /// the ResourceDictionary.</param>
+        private void SetCultureResourceDictionary(string resourceDictionaryFile)
+        {
+            // Scan all resource dictionaries and remove, if it is string resource distionary
+            for (int index = 0; index < Resources.MergedDictionaries.Count; ++index)
+            {
+                // Look for an indicator in the resource file that indicates the resource is
+                // swappable. For instance in our files the header contains this: 
+                // <sys:String x:Key="ResourceDictionaryName">Resources-en-CA</sys:String> 
+                if (Resources.MergedDictionaries[index].Contains("Strings"))
+                {
+                    if (File.Exists(resourceDictionaryFile))
+                    {
+                        Resources.MergedDictionaries.Remove(Resources.MergedDictionaries[index]);
+                    }
+                }
+            }
+
+            // read required resource file to resource dictionary and add to MergedDictionaries collection
+            ResourceDictionary newResourceDictionary = new()
+            {
+                Source = new Uri(resourceDictionaryFile)
+            };
+            Resources.MergedDictionaries.Add(newResourceDictionary);
         }
     }
 

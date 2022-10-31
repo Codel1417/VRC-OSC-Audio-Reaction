@@ -5,162 +5,256 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:VRC_OSC_AudioEars"
-    xmlns:properties="clr-namespace:VRC_OSC_AudioEars.Properties"
+    xmlns:resx="clr-namespace:VRC_OSC_AudioEars.Properties"
     x:Class="VRC_OSC_AudioEars.MainWindow"
 
-        mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}"
-        Title="VRC OSC Audio Reaction" MinWidth="400" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" Initialized="Window_Initialized" Closed="Window_Closed" WindowStyle="SingleBorderWindow">
+    mc:Ignorable="d"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    Background="{DynamicResource MaterialDesignPaper}"
+    Title="{x:Static resx:Strings.appName}" MinWidth="400" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
+    Initialized="Window_Initialized" Closed="Window_Closed" WindowStyle="SingleBorderWindow">
     <Grid>
         <materialDesign:Transitioner SelectedIndex="0" x:Name="Transitioner">
-        <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}" TransitionOrigin="0,0">
-            <StackPanel>
-                <DockPanel>
-                    <materialDesign:ColorZone
-                    Padding="16"
-                    materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                    Mode="PrimaryMid"
-                    DockPanel.Dock="Top">
+            <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}"
+                                              TransitionOrigin="0,0">
+                <StackPanel>
+                    <DockPanel>
+                        <materialDesign:ColorZone
+                            Padding="16"
+                            materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                            Mode="PrimaryMid"
+                            DockPanel.Dock="Top">
                             <Grid>
                                 <TextBlock
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            FontSize="22"
-                            Margin="10,0,0,0"
-                            AutomationProperties.Name="VRC OSC Audio Reaction"
-                            Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
-                            Text="VRC OSC Audio Reaction"/>
-                                <Button Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Right" Height="30" VerticalAlignment="Center" Width="30" Click="settingsButton_Click">
-                                    <materialDesign:PackIcon Kind="CogOutline" Foreground="{DynamicResource MaterialDesignForeground}"/>
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Margin="10,0,0,0"
+                                    AutomationProperties.Name="{DynamicResource resx:Resources.appName}"
+                                    Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
+                                    Text="{x:Static resx:Strings.appName}" />
+                                <Button Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Right"
+                                        Height="30" VerticalAlignment="Center" Width="30" Click="settingsButton_Click">
+                                    <materialDesign:PackIcon Kind="CogOutline"
+                                                             Foreground="{DynamicResource MaterialDesignForeground}" />
                                 </Button>
-                                <Button Visibility="Hidden" Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Right" Height="30" VerticalAlignment="Center" Width="30" Margin="0,0,30,0" Click="aboutButton_Click">
-                                    <materialDesign:PackIcon Kind="AboutOutline" Foreground="{DynamicResource MaterialDesignForeground}"/>
+                                <Button Visibility="Hidden" Style="{DynamicResource MaterialDesignIconButton}"
+                                        HorizontalAlignment="Right" Height="30" VerticalAlignment="Center" Width="30"
+                                        Margin="0,0,30,0" Click="aboutButton_Click">
+                                    <materialDesign:PackIcon Kind="AboutOutline"
+                                                             Foreground="{DynamicResource MaterialDesignForeground}" />
                                 </Button>
                             </Grid>
                         </materialDesign:ColorZone>
-                </DockPanel>
-                    <materialDesign:TransitioningContent RunHint="Loaded"  Opacity="0" OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplierExtension 0:0:0.1}">
+                    </DockPanel>
+                    <materialDesign:TransitioningContent RunHint="Loaded" Opacity="0"
+                                                         OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplierExtension 0:0:0.1}">
                         <materialDesign:TransitioningContent.OpeningEffects>
-                            <materialDesign:TransitionEffect Kind="SlideInFromLeft"/>
-                            <materialDesign:TransitionEffect Kind="FadeIn"/>
+                            <materialDesign:TransitionEffect Kind="SlideInFromLeft" />
+                            <materialDesign:TransitionEffect Kind="FadeIn" />
                         </materialDesign:TransitioningContent.OpeningEffects>
                         <materialDesign:Card Padding="20" Margin="10" Width="350">
-                                <StackPanel>
-                                    <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Center"><Run Text="Controls"/></TextBlock>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="35">
-                                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0,0,0,4"><Run Text="Gain"/></TextBlock>
-                                    <Slider Height="28" Margin="20,0,20,0" VerticalAlignment="Stretch" TickPlacement="TopLeft" Width="253" Value="{Binding Source={x:Static properties:Settings.Default}, Path=gain, Mode=TwoWay}" Maximum="3" RenderTransformOrigin="0.5,0.5" LargeChange="0.5" TickFrequency="0.25" AutoToolTipPrecision="1" IsSnapToTickEnabled="True"/>
+                            <StackPanel>
+                                <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}"
+                                           HorizontalAlignment="Center">
+                                    <Run Text="{x:Static resx:Strings.controls}" />
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch" Height="35">
+                                    <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               Padding="0,0,0,4">
+                                        <Run Text="{x:Static resx:Strings.gain}" />
+                                    </TextBlock>
+                                    <Slider Height="28" Margin="20,0,20,0" VerticalAlignment="Stretch"
+                                            TickPlacement="TopLeft" Width="253"
+                                            Value="{Binding Source={x:Static resx:Settings.Default}, Path=gain, Mode=TwoWay}"
+                                            Maximum="3" RenderTransformOrigin="0.5,0.5" LargeChange="0.5"
+                                            TickFrequency="0.25" AutoToolTipPrecision="1" IsSnapToTickEnabled="True" />
                                 </StackPanel>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Enabled"/></TextBlock>
-                                    <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}" Margin="10,0,10,0" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=enabled, Mode=TwoWay}" Checked="CheckBox_Checked"/>
-                                    </StackPanel>
+                                <ComboBox Style="{DynamicResource MaterialDesignComboBox}" Name="DeviceName"
+                                          SelectionChanged="DeviceName_SelectionChanged"
+                                          Initialized="DeviceName_Initialized" Margin="0,0,0,5">
+                                    Device Name
+                                </ComboBox>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch"
+                                            HorizontalAlignment="Stretch">
+                                    <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               Margin="0,0,10,0">
+                                        <Run Text="{x:Static resx:Strings.enabled}" />
+                                    </TextBlock>
+                                    <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}"
+                                              Margin="10,0,10,0"
+                                              IsChecked="{Binding Source={x:Static resx:Settings.Default}, Path=enabled, Mode=TwoWay}"
+                                              Checked="CheckBox_Checked" />
                                 </StackPanel>
-                            </materialDesign:Card>
+                            </StackPanel>
+                        </materialDesign:Card>
                     </materialDesign:TransitioningContent>
-                    <materialDesign:TransitioningContent RunHint="Loaded"  Opacity="0" OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplierExtension 0:0:0.1}">
+                    <materialDesign:TransitioningContent RunHint="Loaded" Opacity="0"
+                                                         OpeningEffectsOffset="{materialDesign:IndexedItemOffsetMultiplierExtension 0:0:0.1}">
                         <materialDesign:TransitioningContent.OpeningEffects>
-                            <materialDesign:TransitionEffect Kind="SlideInFromLeft"/>
-                            <materialDesign:TransitionEffect Kind="FadeIn"/>
+                            <materialDesign:TransitionEffect Kind="SlideInFromLeft" />
+                            <materialDesign:TransitionEffect Kind="FadeIn" />
                         </materialDesign:TransitioningContent.OpeningEffects>
                         <materialDesign:Card Padding="20" Margin="10" Width="350">
                             <StackPanel Orientation="Vertical">
-                                <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Center"><Run Text="Status"/></TextBlock>
-                                <ComboBox Style="{DynamicResource MaterialDesignComboBox}" Name="DeviceName"  SelectionChanged="DeviceName_SelectionChanged" Initialized="DeviceName_Initialized" Margin="0,0,0,5">Device Name</ComboBox>
+                                <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}"
+                                           HorizontalAlignment="Center">
+                                    <Run Text="{x:Static resx:Strings.status}" />
+                                </TextBlock>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{DynamicResource MaterialDesignBody2TextBlock}" VerticalAlignment="Center" Margin="0,0,10,0" Width="10"><Run Text="L"/></TextBlock>
-                                    <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Width="290" Name="LeftAudioMeter" Maximum="1"/>
+                                    <TextBlock Style="{DynamicResource MaterialDesignBody2TextBlock}"
+                                               VerticalAlignment="Center" Margin="0,0,10,0" Width="10">
+                                        <Run Text="{x:Static resx:Strings.L}" />
+                                    </TextBlock>
+                                    <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Width="290"
+                                                 Name="LeftAudioMeter" Maximum="1" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{DynamicResource MaterialDesignBody2TextBlock}"  HorizontalAlignment="Center" Margin="0,0,10,0" Width="10"><Run Text="R "/></TextBlock>
-                                    <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Width="290" Name="RightAudioMeter" LargeChange="0" Maximum="1"/>
+                                    <TextBlock Style="{DynamicResource MaterialDesignBody2TextBlock}"
+                                               HorizontalAlignment="Center" Margin="0,0,10,0" Width="10">
+                                        <Run Text="{x:Static resx:Strings.R}" />
+                                    </TextBlock>
+                                    <ProgressBar Style="{DynamicResource MaterialDesignLinearProgressBar}" Width="290"
+                                                 Name="RightAudioMeter" LargeChange="0" Maximum="1" />
                                 </StackPanel>
                             </StackPanel>
                         </materialDesign:Card>
                     </materialDesign:TransitioningContent>
                 </StackPanel>
-        </materialDesign:TransitionerSlide>
-        <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}" TransitionOrigin="1,0">
-            <materialDesign:TransitionerSlide.BackwardWipe>
-                <materialDesign:CircleWipe/>
-            </materialDesign:TransitionerSlide.BackwardWipe>
-            <StackPanel>
-                <DockPanel>
-                    <materialDesign:ColorZone
-                    Padding="16"
-                    materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                    Mode="PrimaryMid"
-                    DockPanel.Dock="Top">
-                        <Grid>
-                            <Button Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Left" Height="30" VerticalAlignment="Center" Width="30" Click="HomeButton_Click">
-                                <materialDesign:PackIcon Kind="ArrowBack" Foreground="{DynamicResource MaterialDesignForeground}"/>
-                            </Button>
-                            <TextBlock
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            FontSize="22"
-                            Margin="40,0,0,0"
-                            Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
-                            Text="Settings"/>
-                        </Grid>
-                    </materialDesign:ColorZone>
-                </DockPanel>
-                <StackPanel Orientation="Vertical" Margin="20,10,20,10" >
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="Error Reporting "/></TextBlock>
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=error_reporting, Mode=TwoWay}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Port "/></TextBlock>
-                            <TextBox  Style="{DynamicResource MaterialDesignTextBox}" PreviewTextInput="Osc_port_input_PreviewTextInput" Width="50" MaxLines="1" MaxLength="5" Text="{Binding Source={x:Static properties:Settings.Default}, Path=port, Mode=TwoWay}" InputScope="Number"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Direction Parameter "/></TextBlock>
-                            <TextBox  Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="{Binding Source={x:Static properties:Settings.Default}, Path=audio_direction, Mode=TwoWay}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="OSC Volume Parameter "/></TextBlock>
-                            <TextBox  Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1" MaxLength="30" Text="{Binding Source={x:Static properties:Settings.Default}, Path=audio_volume, Mode=TwoWay}"/>
-                    </StackPanel>
-                    <Button Style="{DynamicResource MaterialDesignFlatAccentBgButton}" Click="Save_config_Click" Content="Save Config" Margin="0,20,0,10"></Button>
-                    <Button Style="{DynamicResource MaterialDesignFlatSecondaryButton}" Click="Reset_config_Click" Content="Reset Config" Margin="0,0,0,10"></Button>
-                </StackPanel>
-            </StackPanel>
-        </materialDesign:TransitionerSlide>
-            <materialDesign:TransitionerSlide>
+            </materialDesign:TransitionerSlide>
+            <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}"
+                                              TransitionOrigin="1,0">
                 <materialDesign:TransitionerSlide.BackwardWipe>
-                    <materialDesign:CircleWipe/>
+                    <materialDesign:CircleWipe />
                 </materialDesign:TransitionerSlide.BackwardWipe>
                 <StackPanel>
                     <DockPanel>
                         <materialDesign:ColorZone
-                    Padding="16"
-                    materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                    Mode="PrimaryMid"
-                    DockPanel.Dock="Top">
+                            Padding="16"
+                            materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                            Mode="PrimaryMid"
+                            DockPanel.Dock="Top">
                             <Grid>
-                                <Button x:Name="HomeButton2" Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Left" Height="30" VerticalAlignment="Center" Width="30" Click="HomeButton_Click">
-                                    <materialDesign:PackIcon Kind="ArrowBack" Foreground="{DynamicResource MaterialDesignForeground}"/>
+                                <Button Style="{DynamicResource MaterialDesignIconButton}" HorizontalAlignment="Left"
+                                        Height="30" VerticalAlignment="Center" Width="30" Click="HomeButton_Click">
+                                    <materialDesign:PackIcon Kind="ArrowBack"
+                                                             Foreground="{DynamicResource MaterialDesignForeground}" />
                                 </Button>
                                 <TextBlock
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            FontSize="22"
-                            Margin="40,0,0,0"
-                            Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
-                            Text="About"/>
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Margin="40,0,0,0"
+                                    Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
+                                    Text="{x:Static resx:Strings.settings}" />
                             </Grid>
                         </materialDesign:ColorZone>
-                        
                     </DockPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="Version: "/></TextBlock>
-                        <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"><Run Text="{x:Static local:Helpers.AssemblyProductVersion}"/></TextBlock>
+                    <StackPanel Orientation="Vertical" Margin="20,10,20,10">
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Run Text="{x:Static resx:Strings.errorReporting}" />
+                            </TextBlock>
+                            <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}"
+                                      IsChecked="{Binding Source={x:Static resx:Settings.Default}, Path=error_reporting, Mode=TwoWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Run Text="{x:Static resx:Strings.Port}" />
+                            </TextBlock>
+                            <TextBox Style="{DynamicResource MaterialDesignTextBox}"
+                                     PreviewTextInput="Osc_port_input_PreviewTextInput" Width="50" MaxLines="1"
+                                     MaxLength="5"
+                                     Text="{Binding Source={x:Static resx:Settings.Default}, Path=port, Mode=TwoWay}"
+                                     InputScope="Number" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Run Text="{x:Static resx:Strings.directionParameter}" />
+                            </TextBlock>
+                            <TextBox Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1"
+                                     MaxLength="30"
+                                     Text="{Binding Source={x:Static resx:Settings.Default}, Path=audio_direction, Mode=TwoWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Run Text="{x:Static resx:Strings.magnitudeParameter}" />
+                            </TextBlock>
+                            <TextBox Style="{DynamicResource MaterialDesignTextBox}" Width="150" MaxLines="1"
+                                     MaxLength="30"
+                                     Text="{Binding Source={x:Static resx:Settings.Default}, Path=audio_volume, Mode=TwoWay}" />
+                        </StackPanel>
+                        <Button Style="{DynamicResource MaterialDesignFlatAccentBgButton}" Click="Save_config_Click"
+                                Content="{x:Static resx:Strings.saveConfig}" Margin="0,20,0,10">
+                        </Button>
+                        <Button Style="{DynamicResource MaterialDesignFlatSecondaryButton}" Click="Reset_config_Click"
+                                Content="{x:Static resx:Strings.resetConfig}" Margin="0,0,0,10">
+                        </Button>
+                        <Button Style="{DynamicResource MaterialDesignFlatSecondaryButton}" Click="aboutButton_Click"
+                                Content="{x:Static resx:Strings.about}" Margin="0,0,0,10">
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </materialDesign:TransitionerSlide>
-    </materialDesign:Transitioner>
-        <materialDesign:Snackbar x:Name="SnackBar" MessageQueue="{materialDesign:MessageQueue}" HorizontalAlignment="Stretch" />
+            <materialDesign:TransitionerSlide>
+                <materialDesign:TransitionerSlide.BackwardWipe>
+                    <materialDesign:CircleWipe />
+                </materialDesign:TransitionerSlide.BackwardWipe>
+                <StackPanel>
+                    <DockPanel>
+                        <materialDesign:ColorZone
+                            Padding="16"
+                            materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                            Mode="PrimaryMid"
+                            DockPanel.Dock="Top">
+                            <Grid>
+                                <Button x:Name="HomeButton2" Style="{DynamicResource MaterialDesignIconButton}"
+                                        HorizontalAlignment="Left" Height="30" VerticalAlignment="Center" Width="30"
+                                        Click="settingsButton_Click">
+                                    <materialDesign:PackIcon Kind="ArrowBack"
+                                                             Foreground="{DynamicResource MaterialDesignForeground}" />
+                                </Button>
+                                <TextBlock
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Margin="40,0,0,0"
+                                    Style="{DynamicResource MaterialDesignHeadline1TextBlock}"
+                                    Text="{x:Static resx:Strings.about}" />
+                            </Grid>
+                        </materialDesign:ColorZone>
+                    </DockPanel>
+                    <StackPanel Orientation="Vertical" Margin="20,10,20,10">
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Run Text="{x:Static resx:Strings.version}" />
+                            </TextBlock>
+                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Run Text="{x:Static local:Helpers.AssemblyProductVersion}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Style="{DynamicResource MaterialDesignFlatSecondaryButton}" Click="GithubButtonClick"
+                                Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="8,0,0,0"
+                                           VerticalAlignment="Center" Text="{x:Static resx:Strings.github}"/>
+                                <materialDesign:PackIcon Kind="Github"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:TransitionerSlide>
+        </materialDesign:Transitioner>
+        <materialDesign:Snackbar x:Name="SnackBar" MessageQueue="{materialDesign:MessageQueue}"
+                                 HorizontalAlignment="Stretch" />
     </Grid>
 </Window>

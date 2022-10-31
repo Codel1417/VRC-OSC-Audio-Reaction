@@ -15,7 +15,6 @@ namespace VRC_OSC_AudioEars
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Runs in background")]
         private readonly WindowColor windowColor = new();
-        public String WindowTitle = "VRC OSC Audio Ears" + Helpers.AssemblyProductVersion;
         public MainWindow()
         {
             Helpers.mainWindow = this;
@@ -98,6 +97,11 @@ namespace VRC_OSC_AudioEars
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             DeviceName_SelectionChanged(sender, null);
+        }
+
+        private async void GithubButtonClick(object sender, RoutedEventArgs e)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/Codel1417/VRC-OSC-Audio-Reaction"));
         }
     }
 }
