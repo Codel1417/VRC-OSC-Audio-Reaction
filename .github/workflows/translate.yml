@@ -5,10 +5,7 @@ name: Create translation pull request
 # events but only for the main branch
 on:
   push:
-    branches: [ main ]
-    paths:
-    - '**.resx'      # XML-based (resource) translation file format, .NET
-  workflow_dispatch:
+    branches: [ master ]
 
 # GitHub automatically creates a GITHUB_TOKEN secret to use in your workflow.
 env:
@@ -46,7 +43,7 @@ jobs:
           #toLocales: '["es","fr","de"]'
 
       - name: create-pull-request
-        uses: peter-evans/create-pull-request@v3.4.1
+        uses: peter-evans/create-pull-request@v4.2.0
         if: ${{ steps.translator.outputs.has-new-translations }} == 'true'
         with:
           title: '${{ steps.translator.outputs.summary-title }}'
