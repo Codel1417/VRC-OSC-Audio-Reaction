@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="appName" xml:space="preserve">
+    <value>VRC OSC ᓂᐱᓕᐅᕈᑏᑦ</value>
+    <comment>Title</comment>
+  </data>
+  <data name="controls" xml:space="preserve">
+    <value>ᐊᐅᓚᑦᑎᔾᔪᑏᑦ</value>
+  </data>
+  <data name="directionParameter" xml:space="preserve">
+    <value>OSC ᓇᒧᙵᐅᓂᐊᕐᓂᕆᔭᖓᑕ ᑭᒡᓕᐊ</value>
+  </data>
+  <data name="enabled" xml:space="preserve">
+    <value>OSC−ᒧᑦ ᐊᔪᖅᑎᑕᐅᙱᑦᑐᑦ</value>
+  </data>
+  <data name="errorReporting" xml:space="preserve">
+    <value>ᑕᒻᒪᖅᓯᒪᔪᓂᒃ ᐅᓂᒃᑲᐅᓯᖃᕐᓂᖅ</value>
+  </data>
+  <data name="gain" xml:space="preserve">
+    <value>ᐱᑖᕐᓂᖅ</value>
+  </data>
+  <data name="L" xml:space="preserve">
+    <value>L</value>
+  </data>
+  <data name="magnitudeParameter" xml:space="preserve">
+    <value>OSC ᐊᖏᓂᖓ</value>
+  </data>
+  <data name="Port" xml:space="preserve">
+    <value>OSC ᑐᓚᒃᑕᕐᕕᒃ</value>
+  </data>
+  <data name="R" xml:space="preserve">
+    <value>R</value>
+  </data>
+  <data name="resetConfig" xml:space="preserve">
+    <value>ᐋᖅᑭᒋᐊᒃᑲᓐᓂᕐᓂᖅ</value>
+  </data>
+  <data name="saveConfig" xml:space="preserve">
+    <value>ᐱᐅᕐᓱᐊᕐᓗᒍ</value>
+  </data>
+  <data name="settings" xml:space="preserve">
+    <value>ᐋᖅᑭᒃᓯᒪᓂᖏᑦ</value>
+  </data>
+  <data name="status" xml:space="preserve">
+    <value>ᖃᓄᐃᓕᖓᓂᖓ</value>
+  </data>
+  <data name="updateGo" xml:space="preserve">
+    <value>ᓄᑖᙳᕆᐊᖅᓯᒪᔪᑦ</value>
+  </data>
+  <data name="updateMessage" xml:space="preserve">
+    <value>ᓄᑖᒥᒃ ᑎᑎᕋᖅᓯᒪᔪᒥᒃ ᒪᓂᒪᔪᖃᓕᖅᐳᖅ</value>
+  </data>
+  <data name="about" xml:space="preserve">
+    <value>ᒥᒃᓵᓄᑦ</value>
+  </data>
+  <data name="version" xml:space="preserve">
+    <value>ᑎᑎᕋᖅᓯᒪᔪᖅ</value>
+  </data>
+  <data name="deviceError" xml:space="preserve">
+    <value>ᐊᑐᕈᓐᓇᙱᑦᑐᖅ ᓂᕈᐊᖅᑕᐅᓯᒪᔪᒥᒃ ᐱᖁᑎᒥᒃ!</value>
+  </data>
+  <data name="github" xml:space="preserve">
+    <value>ᒋᑕᑉ</value>
+  </data>
+</root>

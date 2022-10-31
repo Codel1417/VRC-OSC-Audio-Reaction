@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="appName" xml:space="preserve">
+    <value>VRC OSC ఆడియో రియాక్షన్</value>
+    <comment>Title</comment>
+  </data>
+  <data name="controls" xml:space="preserve">
+    <value>నియంత్రణలు</value>
+  </data>
+  <data name="directionParameter" xml:space="preserve">
+    <value>OSC దిశ పరామీటర్</value>
+  </data>
+  <data name="enabled" xml:space="preserve">
+    <value>OSC ఎనేబుల్ చేయబడింది</value>
+  </data>
+  <data name="errorReporting" xml:space="preserve">
+    <value>దోష నివేదన</value>
+  </data>
+  <data name="gain" xml:space="preserve">
+    <value>పొందు</value>
+  </data>
+  <data name="L" xml:space="preserve">
+    <value>L</value>
+  </data>
+  <data name="magnitudeParameter" xml:space="preserve">
+    <value>OSC వాల్యూమ్ పరామీటర్</value>
+  </data>
+  <data name="Port" xml:space="preserve">
+    <value>OSC పోర్ట్</value>
+  </data>
+  <data name="R" xml:space="preserve">
+    <value>R</value>
+  </data>
+  <data name="resetConfig" xml:space="preserve">
+    <value>కాన్ఫిగ్ రీసెట్ చేయి</value>
+  </data>
+  <data name="saveConfig" xml:space="preserve">
+    <value>కాన్ఫిగ్ ను సేవ్ చేయి</value>
+  </data>
+  <data name="settings" xml:space="preserve">
+    <value>అమర్పులు</value>
+  </data>
+  <data name="status" xml:space="preserve">
+    <value>హోదా</value>
+  </data>
+  <data name="updateGo" xml:space="preserve">
+    <value>అప్ డేట్ చేయి</value>
+  </data>
+  <data name="updateMessage" xml:space="preserve">
+    <value>ఒక కొత్త వెర్షన్ లభ్యం అవుతోంది</value>
+  </data>
+  <data name="about" xml:space="preserve">
+    <value>గురించి</value>
+  </data>
+  <data name="version" xml:space="preserve">
+    <value>సంస్కరణ</value>
+  </data>
+  <data name="deviceError" xml:space="preserve">
+    <value>ఎంచుకున్న పరికరాన్ని ఉపయోగించడం సాధ్యం కాదు!</value>
+  </data>
+  <data name="github" xml:space="preserve">
+    <value>గితబ్</value>
+  </data>
+</root>
