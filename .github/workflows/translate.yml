@@ -6,7 +6,8 @@ name: Create translation pull request
 on:
   push:
     branches: [ master ]
-
+    paths:
+      - '**.resx'
 # GitHub automatically creates a GITHUB_TOKEN secret to use in your workflow.
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

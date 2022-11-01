@@ -3,7 +3,8 @@ name: MSBuild
 on:
   push:
   pull_request:
-
+  paths:
+    - 'VRC-OSC-AudioEars/**'
 env:
   # Path to the solution file relative to the root of the project.
   SOLUTION_FILE_PATH: .
