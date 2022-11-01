@@ -48,7 +48,9 @@ jobs:
       with:
         # A file, directory or wildcard pattern that describes what to upload
         path: "VRC-OSC-AudioEars\\bin\\release\\net6.0-windows10.0.18362.0\\win-x64\\publish\\"
-        
+    - name: Set path for candle and light
+      run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
+      shell: bash
     - name: Build Installer
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: dotnet publish -c release --os win --force --arch x64 Installer/Installer.wixproj
