@@ -1,23 +1,20 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="VRC OSC AUDIO REACTION" Language="1033" Version="1.0.0.0" Manufacturer="Codel1417"
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+	<Product Id="*" Name="VRC OSC AUDIO REACTION" Language="1033" Version="1.0.0.0" Manufacturer="Codel1417"
              UpgradeCode="F7EF1A05-0FDB-4875-BD0A-652DE459AA11">
-        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64"/>
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" Platform="x64"/>
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
         <MediaTemplate EmbedCab="yes"/>
+		<SetProperty Id="ProgramFilesFolder" Value="[LocalAppDataFolder]" Before="CostFinalize"><![CDATA[NOT Privileged]]></SetProperty>
 
-        <Feature Id="ProductFeature" Title="Base Program" Level="1" ConfigurableDirectory="TARGETDIR" Absent="disallow">
-            <ComponentRef Id="ProductComponent"/>
+		<Feature Id="ProductFeature" Title="Base Program" Level="1" ConfigurableDirectory="INSTALLFOLDER" Absent="disallow" AllowAdvertise="yes">
             <ComponentGroupRef Id="ProductFilesComponentGroup"/>
-        </Feature>
-        <Feature Id="optional" Level="2" Title="Install Start Menu Shortcut">
-            <ComponentRef Id="ApplicationShortcut"/>
-        </Feature>
+			<ComponentRef Id="ApplicationShortcut"/>
+		</Feature>
         <Directory Id="TARGETDIR" Name="SourceDir" ComponentGuidGenerationSeed="E4CAB9BB-06EF-4681-8340-C05A27853689">
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLFOLDER" Name="VRC_OSC_Audio_Ears"/>
-            </Directory>
-            <Directory Id="INSTALLLOCATION" Name="HarvestSetup">
                 <Directory Id="ProductFilesComponentGroup"/>
             </Directory>
             <Directory Id="ProgramMenuFolder">
@@ -26,48 +23,58 @@
         </Directory>
         <DirectoryRef Id="ApplicationProgramsFolder">
             <Component Id="ApplicationShortcut" Guid="05BA373A-A6A8-49AC-AAAE-3A248B5856D3">
-                <Shortcut Id="ApplicationStartMenuShortcut"
+				<Shortcut Id="ApplicationStartMenuShortcut"
                           Name="VRC OSC Audio Reaction"
                           Description="Animate osc paramaters with audio"
-                          Target="[#AudioEarsExe]"
-                          WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+                          Target="[INSTALLFOLDER]\VRC_OSC_AudioEars.exe"
+                          WorkingDirectory="APPLICATIONROOTDIRECTORY">
+					<Icon Id="icon.ico" SourceFile="..\VRC-OSC-AudioEars\icon-256x.ico"/>
+				</Shortcut>
                 <Shortcut Id="UninstallProduct"
                           Name="Uninstall VRC OSC Audio Reaction"
                           Target="[SystemFolder]msiexec.exe"
                           Arguments="/x [ProductCode]"
                           Description="Uninstalls MVRC OSC Audio Reaction"/>
                 <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
-                <RegistryValue Root="HKCU" Key="Software\MyCompany\MyApplicationName" Name="installed" Type="integer"
+                <RegistryValue Root="HKCU" Key="Software\Codel1417\VRC-OSC-AudioEars" Name="installed" Type="integer"
                                Value="1" KeyPath="yes"/>
             </Component>
         </DirectoryRef>
-        <Component Id="ProductComponent" Guid="7F3A113A-3A1F-4EBA-AE46-53F6BBB0C732" Directory="INSTALLFOLDER">
-            <File Id="AudioEarsExe" Name="$(var.VRC-OSC-AudioEars.TargetFileName)"
-                  Source="$(var.VRC-OSC-AudioEars.TargetPath)" DiskId="1" KeyPath="yes" Vital="yes">
-            </File>
-        </Component>
-
 
         <Property Id="ApplicationFolderName" Value="VRC_OSC_Audio_Reaction"/>
 
-
-        <UI>
-            <UIRef Id="WixUI_Advanced"/>
+		<UI>
+			<UIRef Id="WixUI_InstallDir"/>
+            <!--Skip license dialog-->
+			<Publish Dialog="WelcomeDlg"
+	          Control="Next"
+	          Event="NewDialog"
+	          Value="InstallDirDlg"
+	          Order="2">1</Publish>
+			<Publish Dialog="InstallDirDlg"
+				  Control="Back"
+				  Event="NewDialog"
+				  Value="WelcomeDlg"
+				  Order="2">1</Publish>
+			
             <Publish Dialog="ExitDialog"
                      Control="Finish"
                      Event="DoAction"
                      Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed
             </Publish>
-        </UI>
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch"/>
+			<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for staying floofy." />
+			<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch"/>
 
         <!-- Step 3: Include the custom action -->
         <Property Id="WixShellExecTarget" Value="[#AudioEarsExe]"/>
         <Property Id="WixAppFolder" Value="WixPerMachineFolder"/>
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
-        <CustomAction Id="LaunchApplication"
+		</UI>
+		<CustomAction Id="LaunchApplication"
                       BinaryKey="WixCA"
                       DllEntry="WixShellExec"
                       Impersonate="yes"/>
-    </Product>
+		<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+	</Product>
 </Wix>

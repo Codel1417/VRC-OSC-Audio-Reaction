@@ -4,7 +4,7 @@ using NAudio.CoreAudioApi.Interfaces;
 
 namespace VRC_OSC_AudioEars;
 
-class AudioEventListener : IMMNotificationClient
+internal class AudioEventListener : IMMNotificationClient
 {
 
     public void OnDeviceStateChanged(string deviceId, DeviceState newState)
@@ -27,7 +27,7 @@ class AudioEventListener : IMMNotificationClient
         if (Audio.Instance.IsDefaultCurrent)
         {       
             string deviceName = "";
-            Helpers.mainWindow?.Dispatcher.Invoke(new Action(() => deviceName = (string) Helpers.mainWindow.DeviceName.SelectedItem));
+            Helpers.MainWindow?.Dispatcher.Invoke(new Action(() => deviceName = (string) Helpers.MainWindow.DeviceName.SelectedItem));
             Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
             Audio.Queue.Enqueue(() => Audio.Instance.SetUpAudio(deviceName));
         }

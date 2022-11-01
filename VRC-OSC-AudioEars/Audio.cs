@@ -1,15 +1,11 @@
 ﻿using BuildSoft.VRChat.Osc;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using NLog;
 using Sentry;
 using System;
-using System.CodeDom;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using Windows.Foundation.Metadata;
@@ -39,9 +35,6 @@ public class Audio
             return _instance;
         }
     }
-
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
     private float _leftRaw;
     private float _rightRaw;
     private bool _shouldUpdate;
@@ -87,9 +80,9 @@ public class Audio
         MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
         bool isDefault = false;
         string defaultDeviceName = defaultDevice.FriendlyName;
-        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() =>
-            isDefault = Helpers.mainWindow.DeviceName.SelectedIndex ==
-                        Helpers.mainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
+        Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
+            isDefault = Helpers.MainWindow.DeviceName.SelectedIndex ==
+                        Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
 
         return isDefault;
     }
@@ -97,45 +90,45 @@ public class Audio
     public void UpdateDefaultDevice()
     {
         MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-        Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
+        SentrySdk.AddBreadcrumb("Setting default device: " + defaultDevice.FriendlyName);
         string defaultDeviceName = defaultDevice.FriendlyName;
 
-        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() =>
-            Helpers.mainWindow.DeviceName.SelectedIndex =
-                Helpers.mainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
+        Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
+            Helpers.MainWindow.DeviceName.SelectedIndex =
+                Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
         IsDefaultCurrent = true;
     }
 
     public void UpdateUiDeviceList()
     {
-        Logger.Debug("Updating UI device list");
+        SentrySdk.AddBreadcrumb("Updating UI device list");
         ComboBox? combobox = null;
-        Helpers.mainWindow?.Dispatcher.Invoke(new Action(() =>
-            combobox = Helpers.mainWindow.DeviceName));
+        Helpers.MainWindow?.Dispatcher.Invoke(new Action(() =>
+            combobox = Helpers.MainWindow.DeviceName));
         if (combobox != null)
         {
-            Helpers.mainWindow?.Dispatcher.Invoke(() =>
-                Helpers.mainWindow.DeviceName.Items.Clear());
+            Helpers.MainWindow?.Dispatcher.Invoke(() =>
+                Helpers.MainWindow.DeviceName.Items.Clear());
 
             IEnumerable<MMDevice> devices = GetDeviceList();
             MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
             foreach (string? name in devices.Select(wasapi => wasapi.FriendlyName))
             {
-                Helpers.mainWindow?.Dispatcher.Invoke(() =>
-                    Helpers.mainWindow.DeviceName.Items.Add(name));
+                Helpers.MainWindow?.Dispatcher.Invoke(() =>
+                    Helpers.MainWindow.DeviceName.Items.Add(name));
             }
 
             int index = -1;
-            Helpers.mainWindow?.Dispatcher.Invoke(() =>
-                index = Helpers.mainWindow.DeviceName.SelectedIndex);
+            Helpers.MainWindow?.Dispatcher.Invoke(() =>
+                index = Helpers.MainWindow.DeviceName.SelectedIndex);
             if (index == -1 )
             {
-                Logger.Debug("Setting default device: " + defaultDevice.FriendlyName);
+                SentrySdk.AddBreadcrumb("Setting default device: " + defaultDevice.FriendlyName);
                 string defaultDeviceName = defaultDevice.FriendlyName;
 
-                Helpers.mainWindow?.Dispatcher.Invoke(() =>
-                    Helpers.mainWindow.DeviceName.SelectedIndex ==
-                    Helpers.mainWindow.DeviceName.Items.IndexOf(defaultDeviceName));
+                Helpers.MainWindow?.Dispatcher.Invoke(() =>
+                    Helpers.MainWindow.DeviceName.SelectedIndex ==
+                    Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName));
                 IsDefaultCurrent = true;
             }
         }
@@ -143,7 +136,7 @@ public class Audio
 
     private IEnumerable<MMDevice> GetDeviceList()
     {
-        Logger.Info("Getting list of output devices");
+        SentrySdk.AddBreadcrumb("Getting list of output devices");
         List<MMDevice> mMDevices = new();
         foreach (var wasapi in _enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
         {
@@ -156,13 +149,13 @@ public class Audio
 
     private MMDevice? GetSelectedDevice(string? selectedItem)
     {
-        Logger.Info("Getting selected device: " + selectedItem);
+        SentrySdk.AddBreadcrumb("Getting selected device: " + selectedItem);
         if (selectedItem != null)
         {
             foreach (var device in GetDeviceList().Where(device =>
                          device.FriendlyName.Equals(selectedItem) && device.State == DeviceState.Active))
             {
-                Logger.Debug("Found matching device: " + device.FriendlyName);
+                SentrySdk.AddBreadcrumb("Found matching device: " + device.FriendlyName);
                 IsDefaultCurrent = IsDefaultDevice();
                 return device;
             }
@@ -188,8 +181,7 @@ public class Audio
         MMDevice? newDevice = GetSelectedDevice(selectedItem);
         try
         {
-            Logger.Debug("Setting up audio");
-            Logger.Trace("Getting audio device");
+            SentrySdk.AddBreadcrumb("Setting up audio");
             if (newDevice != null && _activeDevice != null && _activeDevice.FriendlyName == newDevice.FriendlyName &&
                 _capture is { CaptureState: CaptureState.Capturing })
             {
@@ -205,20 +197,17 @@ public class Audio
             _activeDevice = newDevice;
             if (_activeDevice != null)
             {
-                Logger.Trace("Setting up Loopback capture");
-                _capture = new WasapiLoopbackCapture(_activeDevice);
                 if (_activeDevice.AudioEndpointVolume.HardwareSupport == 0)
                 {
                     throw new NotSupportedException("Selected device does not support capturing"); // covers up crash when virtual audio device is selected
                 }
-                Logger.Trace("Setting up Event listeners");
+                _capture = new WasapiLoopbackCapture(_activeDevice);
                 _capture.DataAvailable += OnDataAvailable;
                 _capture.WaveFormat =
                     WaveFormat.CreateIeeeFloatWaveFormat(48000, 2); // Use a consistent format for processing audio
                 _bytesPerSample = _capture.WaveFormat.BitsPerSample / _capture.WaveFormat.BlockAlign;
 
 
-                Logger.Debug("Configuring Sentry scope");
                 SentrySdk.ConfigureScope(scope => scope.Contexts["Audio Device"] = new
                 {
                     _activeDevice.FriendlyName,
@@ -226,13 +215,10 @@ public class Audio
                     ShareMode = _capture.ShareMode.ToString(),
                     _capture.WaveFormat.AverageBytesPerSecond,
                     DeviceState = _activeDevice.State.ToString(),
+                    _activeDevice.AudioEndpointVolume.HardwareSupport,
                 });
                 
-
-                Logger.Trace("Starting capture");
-
                 _capture.StartRecording();
-                Logger.Trace("Started capture");
 
                 SentrySdk.AddBreadcrumb(
                     message: "Audio Set Up " + _activeDevice.FriendlyName,
@@ -244,12 +230,9 @@ public class Audio
         }
         catch (Exception ex)
         {
-            Logger.Error(ex);
             SentrySdk.CaptureException(ex);
-            Helpers.mainWindow?.Dispatcher.InvokeAsync(() =>
-                    Helpers.mainWindow.SnackBar.MessageQueue?.Enqueue(Strings.deviceError));
-            
-
+            Helpers.MainWindow?.Dispatcher.InvokeAsync(() =>
+                    Helpers.MainWindow.SnackBar.MessageQueue?.Enqueue(Strings.deviceError));
             Settings.Default.enabled = false;
         }
     }
@@ -264,11 +247,16 @@ public class Audio
                 continue;
             }
 
-            Queue.TryDequeue(out var data);
-            data?.Invoke();
+
 
             try
             {
+                // Command queue
+                Queue.TryDequeue(out var data);
+                data?.Invoke();
+                
+                
+                
                 _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume,
                     _leftEarIncomingVolume * Settings.Default.gain, 0.3f);
                 _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume,
@@ -290,7 +278,6 @@ public class Audio
             catch (Exception e)
             {
                 // Often errors when trying to send a value while changing avatars
-                Logger.Error(e, "Error sending OSC");
                 SentrySdk.CaptureException(e);
                 await Task.Delay(2000);
             }
@@ -303,9 +290,9 @@ public class Audio
 
     private void UpdateUi()
     {
-        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() =>
-            Helpers.mainWindow.LeftAudioMeter.Value = _leftEarSmoothedVolume));
-        Helpers.mainWindow?.Dispatcher.InvokeAsync(new Action(() =>
-            Helpers.mainWindow.RightAudioMeter.Value = _rightEarSmoothedVolume));
+        Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
+            Helpers.MainWindow.LeftAudioMeter.Value = _leftEarSmoothedVolume));
+        Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
+            Helpers.MainWindow.RightAudioMeter.Value = _rightEarSmoothedVolume));
     }
 }

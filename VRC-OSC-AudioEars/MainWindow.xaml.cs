@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -12,24 +11,20 @@ namespace VRC_OSC_AudioEars
     /// </summary>
     public partial class MainWindow
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Runs in background")]
         private readonly WindowColor windowColor = new();
         public MainWindow()
         {
-            Helpers.mainWindow = this;
-            Helpers.InitLogging(false);
+            Helpers.MainWindow = this;
             InitializeComponent();
         }
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
-            Logger.Info($"Version: {Helpers.AssemblyProductVersion}");
             //Load settings
             if (Settings.Default.error_reporting) await Helpers.InitSentry();
             await Helpers.CheckGitHubNewerVersion().ConfigureAwait(false); // Don't wait for it
             await Audio.Instance.Update().ConfigureAwait(false);// main update loop
-            this.Title = $" - {Helpers.AssemblyProductVersion}";
         }
 
         private void Window_Closed(object sender, EventArgs e) => Environment.Exit(0);

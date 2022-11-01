@@ -1,5 +1,4 @@
 ﻿using MaterialDesignThemes.Wpf;
-using NLog;
 using Sentry;
 using System;
 using System.Linq;
@@ -9,12 +8,11 @@ namespace VRC_OSC_AudioEars
 {
     internal class WindowColor
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly UISettings _uiSettings = new();
 
         public WindowColor()
         {
-            Logger.Debug("Setting up windows color watcher");
+            SentrySdk.AddBreadcrumb("Setting up windows color watcher");
             _uiSettings.ColorValuesChanged += UiSettings_ColorValuesChanged;
             
             SetWindowsColors(_uiSettings);
@@ -23,8 +21,8 @@ namespace VRC_OSC_AudioEars
         private void UiSettings_ColorValuesChanged(UISettings sender, object args)
         {
 
-            Logger.Info("Windows theme updated");
-            Helpers.mainWindow?.Dispatcher.Invoke(() =>
+            SentrySdk.AddBreadcrumb("Windows theme updated");
+            Helpers.MainWindow?.Dispatcher.Invoke(() =>
                 SetWindowsColors(sender));
         }
 
@@ -32,16 +30,14 @@ namespace VRC_OSC_AudioEars
         {
             try
             {
-                Logger.Debug("Setting theme colors");
+                SentrySdk.AddBreadcrumb("Setting theme colors");
                 Windows.UI.Color accentColor = uiSettings.GetColorValue(UIColorType.Accent);
                 Windows.UI.Color backGround = uiSettings.GetColorValue(UIColorType.Background);
                 System.Windows.Media.Color newColor = System.Windows.Media.Color.FromArgb(accentColor.A, accentColor.R, accentColor.G, accentColor.B);
-                var resources = System.Windows.Application.Current.Resources.MergedDictionaries;
-                
-                CustomColorTheme theme = (CustomColorTheme)System.Windows.Application.Current.Resources.MergedDictionaries.OfType<CustomColorTheme>().First<CustomColorTheme>();
+                CustomColorTheme theme = System.Windows.Application.Current.Resources.MergedDictionaries.OfType<CustomColorTheme>().First();
                 theme.PrimaryColor = newColor;
                 theme.SecondaryColor = newColor;
-                theme.BaseTheme = Constants.darkBackground == backGround ? BaseTheme.Dark : BaseTheme.Light;
+                theme.BaseTheme = Windows.UI.Color.FromArgb(255, 0, 0, 0) == backGround ? BaseTheme.Dark : BaseTheme.Light;
             }
             catch (Exception ex)
             {

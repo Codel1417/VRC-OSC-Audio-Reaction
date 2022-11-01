@@ -1,11 +1,5 @@
-﻿using NLog;
-using NLog.Conditions;
-using NLog.Config;
-using NLog.Targets;
-using NLog.Targets.Wrappers;
-using Octokit;
+﻿using Octokit;
 using Sentry;
-using Sentry.NLog;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -17,8 +11,7 @@ namespace VRC_OSC_AudioEars
 {
     public static class Helpers
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public static MainWindow? mainWindow;
+        private static MainWindow? mainWindow;
 
         /// <summary>
         /// Linear interpolation between two values.
@@ -77,13 +70,15 @@ namespace VRC_OSC_AudioEars
             }
         }
 
+        public static MainWindow? MainWindow { get => mainWindow; set => mainWindow = value; }
+
         public static Task InitSentry()
         {
             try
             {
                 SentrySdk.Init(o =>
                 {
-                    o.Dsn = Constants.SENTRY_DSN;
+                    o.Dsn = "https://c39539385af440b2854d2d558c4d8d82@o1187002.ingest.sentry.io/6307588";
                     o.Environment = IsDebugBuild ? "Debug" : "Release";
                     o.Debug = IsDebugBuild;
                     o.TracesSampleRate = 0;
@@ -92,11 +87,10 @@ namespace VRC_OSC_AudioEars
                     o.ReportAssembliesMode = ReportAssembliesMode.InformationalVersion;
                     o.DetectStartupTime = StartupTimeDetectionMode.Best;
                     o.StackTraceMode = StackTraceMode.Enhanced;
-                    o.AddDiagnosticSourceIntegration();
                     o.RequestBodyCompressionLevel = CompressionLevel.SmallestSize;
                     o.DecompressionMethods = System.Net.DecompressionMethods.Deflate;
                     o.EnableScopeSync = true;
-
+                    o.Release = AssemblyProductVersion;
                 });
                 SentrySdk.ConfigureScope(scope =>
                 {
@@ -105,112 +99,39 @@ namespace VRC_OSC_AudioEars
                 });
                 return Task.FromResult(Task.CompletedTask);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Logger.Error(e, "Failed to initialize Sentry");
+                // No one to read the log
             }
-            Logger.Info(SentrySdk.IsEnabled ? "Sentry is enabled" : "Sentry is disabled");
             return Task.CompletedTask;
-        }
-
-        public static void InitLogging(bool verbose)
-        {
-            LoggingConfiguration config = new();
-
-            ColoredConsoleTarget consoleTarget = new();
-            ConsoleRowHighlightingRule hightlightError = new()
-            {
-                Condition = ConditionParser.ParseExpression("level == LogLevel.Error"),
-                ForegroundColor = ConsoleOutputColor.Red
-            };
-            consoleTarget.RowHighlightingRules.Add(hightlightError);
-            ConsoleRowHighlightingRule hightlightWarn = new()
-            {
-                Condition = ConditionParser.ParseExpression("level == LogLevel.Warn"),
-                ForegroundColor = ConsoleOutputColor.Yellow
-            };
-            consoleTarget.RowHighlightingRules.Add(hightlightWarn);
-            ConsoleRowHighlightingRule hightlightInfo = new()
-            {
-                Condition = ConditionParser.ParseExpression("level == LogLevel.Info"),
-                ForegroundColor = ConsoleOutputColor.White
-            };
-            consoleTarget.RowHighlightingRules.Add(hightlightInfo);
-            ConsoleRowHighlightingRule hightlightDebug = new()
-            {
-                Condition = ConditionParser.ParseExpression("level == LogLevel.Debug"),
-                ForegroundColor = ConsoleOutputColor.Gray
-            };
-            consoleTarget.RowHighlightingRules.Add(hightlightDebug);
-            consoleTarget.Layout = "${level}: ${message}";
-
-
-            SentryTarget sentryTarget = new();
-            sentryTarget.InitializeSdk = false;
-            sentryTarget.MinimumBreadcrumbLevel = LogLevel.Debug.ToString();
-            DiagnosticListenerTarget diagnosticListenerTarget = new();
-            TraceTarget traceTarget = new();
-
-            AsyncTargetWrapper asyncTraceTareget = new();
-            asyncTraceTareget.WrappedTarget = traceTarget;
-            AsyncTargetWrapper asyncdiagnosticListenerTarget = new();
-            asyncdiagnosticListenerTarget.WrappedTarget = diagnosticListenerTarget;
-            AsyncTargetWrapper asyncConsoleTarget = new();
-            asyncConsoleTarget.WrappedTarget = consoleTarget;
-            AsyncTargetWrapper asyncSentryTarget = new();
-            asyncSentryTarget.WrappedTarget = sentryTarget;
-
-            config.AddTarget("trace", asyncTraceTareget);
-            config.AddTarget("diagnostic", asyncdiagnosticListenerTarget);
-            config.AddTarget("console", asyncConsoleTarget);
-            config.AddTarget("sentry", asyncSentryTarget);
-            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, asyncdiagnosticListenerTarget);
-            config.AddRule(verbose ? LogLevel.Trace : LogLevel.Info, LogLevel.Fatal, asyncConsoleTarget);
-            config.AddRule(LogLevel.Trace, LogLevel.Fatal, asyncTraceTareget);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, asyncSentryTarget);
-            LogManager.Configuration = config;
         }
 
         public static async Task CheckGitHubNewerVersion()
         {
 
-            Logger.Debug("Checking GitHub for newer version");
+            SentrySdk.AddBreadcrumb("Checking GitHub for newer version");
             try
             {
-                Logger.Trace("Setting up github client");
-                GitHubClient client = new GitHubClient(new ProductHeaderValue(Constants.project_name));
-                Logger.Trace("Getting latest release");
-                IReadOnlyList<Release> releases =
-                    await client.Repository.Release.GetAll(Constants.project_user, Constants.project_name);
+                GitHubClient client = new(new ProductHeaderValue("VRC-OSC-Audio-Reaction"));
+                IReadOnlyList <Release> releases =
+                    await client.Repository.Release.GetAll("Codel1417", "VRC-OSC-Audio-Reaction");
                 if (AssemblyProductVersion != "" && releases.Count > 0)
                 {
-                    Logger.Trace("Getting latest release version");
                     Version latestGitHubVersion = new(releases[0].TagName);
-                    Logger.Trace("Getting local version");
                     Version localVersion = new(Helpers.AssemblyProductVersion);
-                    Logger.Trace("Comparing versions");
                     int versionComparison = localVersion.CompareTo(latestGitHubVersion);
                     if (versionComparison < 0)
                     {
-                        if (mainWindow != null) await mainWindow.Dispatcher.InvokeAsync(new Action(() => mainWindow.SnackBar.MessageQueue?.Enqueue(Strings.updateMessage, Strings.updateGo, async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)), true, true, false, TimeSpan.FromSeconds(15))));
-                        Logger.Warn("A new version of VRC-OSC-Audio-Reaction is available!");
+                        if (MainWindow != null) await MainWindow.Dispatcher.InvokeAsync(new Action(() => MainWindow.SnackBar.MessageQueue?.Enqueue(Strings.updateMessage, Strings.updateGo, async _ => await Windows.System.Launcher.LaunchUriAsync(new Uri(releases[0].HtmlUrl)), true, true, false, TimeSpan.FromSeconds(15))));
                     }
-                    else
-                    {
-                        Logger.Info("You are running the latest version of VRC-OSC-Audio-Reaction!");
-                    }
-                }
-                else
-                {
-                    Logger.Error("Could not check for updates.");
                 }
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Could not check for updates.");
+                SentrySdk.CaptureException(e);
             }
 
-            Logger.Trace("Ending check for updates");
+            SentrySdk.AddBreadcrumb("Ending check for updates");
         }
 
     }

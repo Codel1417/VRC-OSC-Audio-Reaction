@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
+    <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
+    <SuppressIces>ICE80</SuppressIces>
+  </PropertyGroup>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>3.10</ProductVersion>
-    <ProjectGuid>d1b37c4a-6c0e-4b2a-b884-ad6b530532ad</ProjectGuid>
-    <SchemaVersion>2.0</SchemaVersion>
+    <InstallerPlatform>x64</InstallerPlatform>
     <OutputName>Installer</OutputName>
     <OutputType>Package</OutputType>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
-    <SuppressAllWarnings>False</SuppressAllWarnings>
-    <VerboseOutput>True</VerboseOutput>
-    <SuppressValidation>True</SuppressValidation>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <PlatformTarget>x64</PlatformTarget>
+    <HeatDefinitions>MySourcePath=..\VRC-OSC-AudioEars\bin\Release\net6.0-windows10.0.18362.0\win10-x64</HeatDefinitions>
+    <DefineConstants>$(HeatDefinitions)</DefineConstants>
+    <ProjectGuid>{d1b37c4a-6c0e-4b2a-b884-ad6b530532ad}</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\VRC-OSC-AudioEars\VRC-OSC-AudioEars.csproj">
@@ -31,7 +20,7 @@
       <Project>{57f37189-da59-4262-b4d9-6de42f963634}</Project>
       <Private>True</Private>
       <EnableProjectHarvesting>True</EnableProjectHarvesting>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefProjectOutputGroups>Binaries</RefProjectOutputGroups>
       <RefTargetDir>INSTALLLOCATION</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
@@ -40,6 +29,10 @@
     <Compile Include="ProductInstallFiles.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixUtilExtension">
       <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
       <Name>WixUtilExtension</Name>
@@ -55,7 +48,7 @@
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
   <Target Name="BeforeBuild">
-    <HeatDirectory OutputFile="$(ProjectDir)\ProductInstallFiles.wxs" Directory="..\VRC-OSC-AudioEars" ComponentGroupName="ProductFilesComponentGroup" DirectoryRefId="INSTALLLOCATION" AutogenerateGuids="true" PreprocessorVariable="var.VRC-OSC-AudioEars.ProjectDir" SuppressRegistry="true" SuppressRootDirectory="false" ToolPath="$(WixToolPath)" NoLogo="false" RunAsSeparateProcess="$(RunWixToolsOutOfProc)" />
+    <HeatDirectory OutputFile="$(ProjectDir)\ProductInstallFiles.wxs" Directory="..\VRC-OSC-AudioEars\bin\Release\net6.0-windows10.0.18362.0\win10-x64" ComponentGroupName="ProductFilesComponentGroup" DirectoryRefId="INSTALLFOLDER" AutogenerateGuids="true" PreprocessorVariable="var.MySourcePath" SuppressRegistry="true" SuppressRootDirectory="true" SuppressFragments="true" ToolPath="$(WixToolPath)" NoLogo="false" RunAsSeparateProcess="$(RunWixToolsOutOfProc)" />
   </Target>
   <Target Name="AfterBuild">
   </Target>
