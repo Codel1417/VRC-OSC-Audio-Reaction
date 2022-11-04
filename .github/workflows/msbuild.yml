@@ -44,7 +44,7 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild -c release VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj
+      run: msbuild VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj
     - name: Upload App
       uses: actions/upload-artifact@v3.1.1
       with:
