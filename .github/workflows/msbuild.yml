@@ -55,7 +55,7 @@ jobs:
     - name: Build Installer
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: export PATH="C:\Program Files (x86)\WiX Toolset v3.11\bin:$PATH" && \
-        dotnet publish -c release --os win --force --arch x64 Installer/Installer.wixproj
+        msbuild Installer/Installer.wixproj
       shell: bash
       
     - name: Upload Installer
