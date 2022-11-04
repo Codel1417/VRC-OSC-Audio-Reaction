@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  <PropertyGroup>
     <OutputPath>bin\Release\</OutputPath>
     <IntermediateOutputPath>obj\Release\</IntermediateOutputPath>
     <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
     <SuppressIces>ICE80</SuppressIces>
-  </PropertyGroup>
-  <PropertyGroup>
     <InstallerPlatform>x64</InstallerPlatform>
     <OutputName>Installer</OutputName>
     <OutputType>Package</OutputType>
