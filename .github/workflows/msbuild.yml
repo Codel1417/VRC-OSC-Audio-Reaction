@@ -44,12 +44,12 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: dotnet publish -c release --os win --force --arch x64 VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj
+      run: msbuild -c release VRC-OSC-AudioEars/VRC-OSC-AudioEars.csproj
     - name: Upload App
       uses: actions/upload-artifact@v3.1.1
       with:
         # A file, directory or wildcard pattern that describes what to upload
-        path: "VRC-OSC-AudioEars\\bin\\release\\net6.0-windows10.0.18362.0\\win-x64\\publish\\"
+        path: "VRC-OSC-AudioEars\\bin\\release\\"
         
     - name: Build Installer
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -59,5 +59,5 @@ jobs:
       uses: actions/upload-artifact@v3.1.1
       with:
         # A file, directory or wildcard pattern that describes what to upload
-        path: "Installer\\bin\\Release\\Installer.msi"
+        path: "Installer\\bin\\Release\\"
         
