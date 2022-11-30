@@ -1,28 +1,27 @@
-﻿using BuildSoft.VRChat.Osc;
-using NAudio.CoreAudioApi;
-using NAudio.Wave;
-using Sentry;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Windows.Foundation.Metadata;
+using BuildSoft.VRChat.Osc;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
 using VRC_OSC_AudioEars.Properties;
 
-namespace VRC_OSC_AudioEars;
+namespace VRC_OSC_AudioEars.Audio;
 
-[Threading(ThreadingModel.MTA)]
-public class Audio
+internal sealed class Audio
 {
     private Audio()
     {
     }
 
-    public static readonly ConcurrentQueue<Action> Queue = new();
+    private float _gain = 1;
+    internal static readonly ConcurrentQueue<Action> Queue = new();
     private static Audio? _instance = null;
-
+    private bool _enabled = false;
+    private bool _stop = false;
     public static Audio Instance
     {
         get
@@ -35,19 +34,24 @@ public class Audio
             return _instance;
         }
     }
+
     private float _leftRaw;
     private float _rightRaw;
     private bool _shouldUpdate;
+    
     private float _leftEarSmoothedVolume;
     private float _rightEarSmoothedVolume;
+
     private float _leftEarIncomingVolume;
     private float _rightEarIncomingVolume;
     private float _direction = 0;
+    private float _previousDirection = 0;
+    private float _volume = 0;
+    private float _previousVolume = 0;
     private readonly MMDeviceEnumerator _enumerator = new();
     private MMDevice? _activeDevice;
     private WasapiLoopbackCapture? _capture;
     private int _bytesPerSample;
-    public bool IsDefaultCurrent { get; private set; } = true;
 
     private void OnDataAvailable(object? sender, WaveInEventArgs args)
     {
@@ -75,33 +79,18 @@ public class Audio
         }
     }
 
-    private bool IsDefaultDevice()
+    public void UpdateDefaultDeviceUI()
     {
         MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-        bool isDefault = false;
-        string defaultDeviceName = defaultDevice.FriendlyName;
-        Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
-            isDefault = Helpers.MainWindow.DeviceName.SelectedIndex ==
-                        Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
-
-        return isDefault;
-    }
-
-    public void UpdateDefaultDevice()
-    {
-        MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-        SentrySdk.AddBreadcrumb("Setting default device: " + defaultDevice.FriendlyName);
         string defaultDeviceName = defaultDevice.FriendlyName;
 
         Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
             Helpers.MainWindow.DeviceName.SelectedIndex =
                 Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
-        IsDefaultCurrent = true;
     }
 
     public void UpdateUiDeviceList()
     {
-        SentrySdk.AddBreadcrumb("Updating UI device list");
         ComboBox? combobox = null;
         Helpers.MainWindow?.Dispatcher.Invoke(new Action(() =>
             combobox = Helpers.MainWindow.DeviceName));
@@ -121,26 +110,24 @@ public class Audio
             int index = -1;
             Helpers.MainWindow?.Dispatcher.Invoke(() =>
                 index = Helpers.MainWindow.DeviceName.SelectedIndex);
-            if (index == -1 )
+            if (index == -1)
             {
-                SentrySdk.AddBreadcrumb("Setting default device: " + defaultDevice.FriendlyName);
                 string defaultDeviceName = defaultDevice.FriendlyName;
 
                 Helpers.MainWindow?.Dispatcher.Invoke(() =>
                     Helpers.MainWindow.DeviceName.SelectedIndex ==
                     Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName));
-                IsDefaultCurrent = true;
             }
         }
     }
 
     private IEnumerable<MMDevice> GetDeviceList()
     {
-        SentrySdk.AddBreadcrumb("Getting list of output devices");
         List<MMDevice> mMDevices = new();
         foreach (var wasapi in _enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
         {
-            if (wasapi != null && wasapi.AudioEndpointVolume.HardwareSupport  > 0) // covers up crash when virtual audio device is selected
+            if (wasapi != null &&
+                wasapi.AudioEndpointVolume.HardwareSupport > 0) // covers up crash when virtual audio device is selected
                 mMDevices.Add(wasapi);
         }
 
@@ -149,18 +136,14 @@ public class Audio
 
     private MMDevice? GetSelectedDevice(string? selectedItem)
     {
-        SentrySdk.AddBreadcrumb("Getting selected device: " + selectedItem);
         if (selectedItem != null)
         {
             foreach (var device in GetDeviceList().Where(device =>
                          device.FriendlyName.Equals(selectedItem) && device.State == DeviceState.Active))
             {
-                SentrySdk.AddBreadcrumb("Found matching device: " + device.FriendlyName);
-                IsDefaultCurrent = IsDefaultDevice();
                 return device;
             }
 
-            UpdateDefaultDevice();
             return _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
         }
 
@@ -181,7 +164,6 @@ public class Audio
         MMDevice? newDevice = GetSelectedDevice(selectedItem);
         try
         {
-            SentrySdk.AddBreadcrumb("Setting up audio");
             if (newDevice != null && _activeDevice != null && _activeDevice.FriendlyName == newDevice.FriendlyName &&
                 _capture is { CaptureState: CaptureState.Capturing })
             {
@@ -199,68 +181,57 @@ public class Audio
             {
                 if (_activeDevice.AudioEndpointVolume.HardwareSupport == 0)
                 {
-                    throw new NotSupportedException("Selected device does not support capturing"); // covers up crash when virtual audio device is selected
+                    throw new NotSupportedException(
+                        "Selected device does not support capturing"); // covers up crash when virtual audio device is selected
                 }
+
                 _capture = new WasapiLoopbackCapture(_activeDevice);
                 _capture.DataAvailable += OnDataAvailable;
                 _capture.WaveFormat =
                     WaveFormat.CreateIeeeFloatWaveFormat(48000, 2); // Use a consistent format for processing audio
                 _bytesPerSample = _capture.WaveFormat.BitsPerSample / _capture.WaveFormat.BlockAlign;
 
-
-                SentrySdk.ConfigureScope(scope => scope.Contexts["Audio Device"] = new
-                {
-                    _activeDevice.FriendlyName,
-                    CaptureState = _capture.CaptureState.ToString(),
-                    ShareMode = _capture.ShareMode.ToString(),
-                    _capture.WaveFormat.AverageBytesPerSecond,
-                    DeviceState = _activeDevice.State.ToString(),
-                    _activeDevice.AudioEndpointVolume.HardwareSupport,
-                });
-                
                 _capture.StartRecording();
-
-                SentrySdk.AddBreadcrumb(
-                    message: "Audio Set Up " + _activeDevice.FriendlyName,
-                    category: "Audio",
-                    level: BreadcrumbLevel.Info);
 
                 OscUtility.SendPort = Settings.Default.port;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            SentrySdk.CaptureException(ex);
-            Helpers.MainWindow?.Dispatcher.InvokeAsync(() =>
-                    Helpers.MainWindow.SnackBar.MessageQueue?.Enqueue(Strings.deviceError));
             Settings.Default.enabled = false;
         }
     }
 
-    public async Task Update()
+    public void Enable() => _enabled = true;
+    public void Disable() => _enabled = false;
+    public void StopLoop() => Instance._stop = true;
+    public static void StartLoop()
     {
-        while (true)
+        Instance._stop = false;
+        Instance.Update().ConfigureAwait(false);// main update loop
+    }
+
+    public void SetGain(float gain) => this._gain = gain;
+
+    private async Task Update()
+    {
+        while (!_stop)
         {
-            if (!Settings.Default.enabled)
+            // Command queue
+            Queue.TryDequeue(out var data);
+            data?.Invoke();
+            if (!_enabled)
             {
                 await Task.Delay(25);
                 continue;
             }
-
-
-
+            
             try
             {
-                // Command queue
-                Queue.TryDequeue(out var data);
-                data?.Invoke();
-                
-                
-                
-                _leftEarSmoothedVolume = Helpers.VRCClampedLerp(_leftEarSmoothedVolume,
-                    _leftEarIncomingVolume * Settings.Default.gain, 0.3f);
-                _rightEarSmoothedVolume = Helpers.VRCClampedLerp(_rightEarSmoothedVolume,
-                    _rightEarIncomingVolume * Settings.Default.gain, 0.3f);
+                _leftEarSmoothedVolume = VRCClampedLerp(_leftEarSmoothedVolume,
+                    _leftEarIncomingVolume * _gain, 0.3f);
+                _rightEarSmoothedVolume = VRCClampedLerp(_rightEarSmoothedVolume,
+                    _rightEarIncomingVolume * _gain, 0.3f);
                 if (float.IsNaN(_leftEarSmoothedVolume) || float.IsNaN(_rightEarSmoothedVolume) ||
                     float.IsInfinity(_leftEarSmoothedVolume) || float.IsInfinity(_rightEarSmoothedVolume))
                 {
@@ -269,21 +240,30 @@ public class Audio
                     _rightEarSmoothedVolume = 0;
                 }
 
-                _direction = Helpers.VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
+                _direction = VRCClamp(-(_leftEarSmoothedVolume * 2) + (_rightEarSmoothedVolume * 2) + 0.5f);
                 //log values with fixed decimal places
-                OscParameter.SendAvatarParameter(Settings.Default.audio_direction, _direction);
-                OscParameter.SendAvatarParameter(Settings.Default.audio_volume,
-                    (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2);
+                _volume = (_leftEarSmoothedVolume + _rightEarSmoothedVolume) / 2f;
+
+                if (Math.Abs(_direction - _previousDirection) > 0.001f)
+                {
+                    OscParameter.SendAvatarParameter(Settings.Default.audio_direction, _direction);
+                    _previousDirection = _direction;
+                }
+
+                if (Math.Abs(_volume - _previousVolume) > 0.001f)
+                {
+                    OscParameter.SendAvatarParameter(Settings.Default.audio_volume,_volume);
+                    _previousVolume = _volume;
+                }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // Often errors when trying to send a value while changing avatars
-                SentrySdk.CaptureException(e);
                 await Task.Delay(2000);
             }
 
             UpdateUi();
-            await Task.Delay(25);
+            await Task.Delay(50);
             _shouldUpdate = true;
         }
     }
@@ -294,5 +274,26 @@ public class Audio
             Helpers.MainWindow.LeftAudioMeter.Value = _leftEarSmoothedVolume));
         Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
             Helpers.MainWindow.RightAudioMeter.Value = _rightEarSmoothedVolume));
+    }
+
+
+    /// <summary>
+    /// Clamps a float between 0 and 1, while preventing getting too precise when approaching zero. This is due to a bug in VRChat.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>Clamped Value</returns>
+    private static float VRCClamp(float value)
+    {
+        return value switch
+        {
+            < 0.005f => 0.005f,
+            > 1f => 1f,
+            _ => value
+        };
+    }
+
+    private static float VRCClampedLerp(float firstFloat, float secondFloat, float by)
+    {
+        return VRCClamp(firstFloat * (1 - by) + secondFloat * by);
     }
 }

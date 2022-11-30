@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using VRC_OSC_AudioEars.Audio;
 using VRC_OSC_AudioEars.Properties;
 
 namespace VRC_OSC_AudioEars
@@ -17,14 +18,13 @@ namespace VRC_OSC_AudioEars
         {
             Helpers.MainWindow = this;
             InitializeComponent();
+            AudioReactionControl.Start();
         }
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
             //Load settings
-            if (Settings.Default.error_reporting) await Helpers.InitSentry();
             await Helpers.CheckGitHubNewerVersion().ConfigureAwait(false); // Don't wait for it
-            await Audio.Instance.Update().ConfigureAwait(false);// main update loop
         }
 
         private void Window_Closed(object sender, EventArgs e) => Environment.Exit(0);
@@ -74,14 +74,14 @@ namespace VRC_OSC_AudioEars
             if (DeviceName is { SelectedItem: { } })
             {
                 string? deviceName = DeviceName.SelectedItem.ToString();
-                Audio.Queue.Enqueue(() =>  Audio.Instance.SetUpAudio(deviceName));
+                AudioReactionControl.SetUpAudio(deviceName);
             }
         }
 
         private void DeviceName_Initialized(object sender, EventArgs e)
         {
-            Audio.Queue.Enqueue(() => Audio.Instance.UpdateUiDeviceList());
-            Audio.Queue.Enqueue(() => Audio.Instance.UpdateDefaultDevice());
+            AudioReactionControl.UpdateUiDeviceList();
+            AudioReactionControl.UpdateDefaultDeviceUI();
             if (DeviceName != null)
             {
                 DeviceName.InvalidateVisual();
@@ -91,12 +91,23 @@ namespace VRC_OSC_AudioEars
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            AudioReactionControl.Enable();
             DeviceName_SelectionChanged(sender, null);
         }
 
         private async void GithubButtonClick(object sender, RoutedEventArgs e)
         {
             await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/Codel1417/VRC-OSC-Audio-Reaction"));
+        }
+
+        private void ToggleButton_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            AudioReactionControl.Disable();
+        }
+
+        private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            AudioReactionControl.UpdateGain((float) e.NewValue);
         }
     }
 }

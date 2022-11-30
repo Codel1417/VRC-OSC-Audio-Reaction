@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Threading;
-using Sentry;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -32,7 +31,6 @@ namespace VRC_OSC_AudioEars
 
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            SentrySdk.CaptureException(e.Exception);
             e.Handled = true;
         }
     }

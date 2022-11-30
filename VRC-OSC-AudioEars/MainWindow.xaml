@@ -70,7 +70,7 @@
                                             TickPlacement="TopLeft" Width="253"
                                             Value="{Binding Source={x:Static resx:Settings.Default}, Path=gain, Mode=TwoWay}"
                                             Maximum="3" RenderTransformOrigin="0.5,0.5" LargeChange="0.5"
-                                            TickFrequency="0.25" AutoToolTipPrecision="1" IsSnapToTickEnabled="True" />
+                                            TickFrequency="0.25" AutoToolTipPrecision="1" IsSnapToTickEnabled="True" ValueChanged="RangeBase_OnValueChanged"/>
                                 </StackPanel>
                                 <ComboBox Style="{DynamicResource MaterialDesignComboBox}" Name="DeviceName"
                                           SelectionChanged="DeviceName_SelectionChanged"
@@ -87,7 +87,7 @@
                                     <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}"
                                               Margin="10,0,10,0"
                                               IsChecked="{Binding Source={x:Static resx:Settings.Default}, Path=enabled, Mode=TwoWay}"
-                                              Checked="CheckBox_Checked" />
+                                              Checked="CheckBox_Checked" Unchecked="ToggleButton_OnUnchecked" />
                                 </StackPanel>
                             </StackPanel>
                         </materialDesign:Card>
@@ -154,14 +154,6 @@
                         </materialDesign:ColorZone>
                     </DockPanel>
                     <StackPanel Orientation="Vertical" Margin="20,10,20,10">
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                            <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
-                                       HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
-                                <Run Text="{x:Static resx:Strings.errorReporting}" />
-                            </TextBlock>
-                            <CheckBox Style="{DynamicResource MaterialDesignSwitchToggleButton}"
-                                      IsChecked="{Binding Source={x:Static resx:Settings.Default}, Path=error_reporting, Mode=TwoWay}" />
-                        </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                             <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
                                        HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
