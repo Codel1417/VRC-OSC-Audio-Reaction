@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using BuildSoft.VRChat.Osc;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
@@ -78,90 +75,12 @@ internal sealed class Audio
             _rightEarIncomingVolume *= 10;
         }
     }
-
-    public void UpdateDefaultDeviceUI()
+    
+    public void SetUpAudio()
     {
-        MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-        string defaultDeviceName = defaultDevice.FriendlyName;
+      
 
-        Helpers.MainWindow?.Dispatcher.InvokeAsync(new Action(() =>
-            Helpers.MainWindow.DeviceName.SelectedIndex =
-                Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName)));
-    }
-
-    public void UpdateUiDeviceList()
-    {
-        ComboBox? combobox = null;
-        Helpers.MainWindow?.Dispatcher.Invoke(new Action(() =>
-            combobox = Helpers.MainWindow.DeviceName));
-        if (combobox != null)
-        {
-            Helpers.MainWindow?.Dispatcher.Invoke(() =>
-                Helpers.MainWindow.DeviceName.Items.Clear());
-
-            IEnumerable<MMDevice> devices = GetDeviceList();
-            MMDevice defaultDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-            foreach (string? name in devices.Select(wasapi => wasapi.FriendlyName))
-            {
-                Helpers.MainWindow?.Dispatcher.Invoke(() =>
-                    Helpers.MainWindow.DeviceName.Items.Add(name));
-            }
-
-            int index = -1;
-            Helpers.MainWindow?.Dispatcher.Invoke(() =>
-                index = Helpers.MainWindow.DeviceName.SelectedIndex);
-            if (index == -1)
-            {
-                string defaultDeviceName = defaultDevice.FriendlyName;
-
-                Helpers.MainWindow?.Dispatcher.Invoke(() =>
-                    Helpers.MainWindow.DeviceName.SelectedIndex ==
-                    Helpers.MainWindow.DeviceName.Items.IndexOf(defaultDeviceName));
-            }
-        }
-    }
-
-    private IEnumerable<MMDevice> GetDeviceList()
-    {
-        List<MMDevice> mMDevices = new();
-        foreach (var wasapi in _enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
-        {
-            if (wasapi != null &&
-                wasapi.AudioEndpointVolume.HardwareSupport > 0) // covers up crash when virtual audio device is selected
-                mMDevices.Add(wasapi);
-        }
-
-        return mMDevices;
-    }
-
-    private MMDevice? GetSelectedDevice(string? selectedItem)
-    {
-        if (selectedItem != null)
-        {
-            foreach (var device in GetDeviceList().Where(device =>
-                         device.FriendlyName.Equals(selectedItem) && device.State == DeviceState.Active))
-            {
-                return device;
-            }
-
-            return _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-        }
-
-        return null;
-    }
-
-    private bool _registerListener;
-
-    public void SetUpAudio(string? selectedItem)
-    {
-        if (!_registerListener)
-        {
-            //Causes crash when switching device, not the handling just registering the callback :/
-            _enumerator.RegisterEndpointNotificationCallback(new AudioEventListener());
-            _registerListener = true;
-        }
-
-        MMDevice? newDevice = GetSelectedDevice(selectedItem);
+        MMDevice? newDevice = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
         try
         {
             if (newDevice != null && _activeDevice != null && _activeDevice.FriendlyName == newDevice.FriendlyName &&
@@ -193,7 +112,8 @@ internal sealed class Audio
 
                 _capture.StartRecording();
 
-                OscUtility.SendPort = Settings.Default.port;
+                OscConnectionSettings.SendPort = Settings.Default.port;
+                
             }
         }
         catch (Exception)
@@ -263,7 +183,7 @@ internal sealed class Audio
             }
 
             UpdateUi();
-            await Task.Delay(50);
+            await Task.Delay(25);
             _shouldUpdate = true;
         }
     }

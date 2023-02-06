@@ -19,6 +19,7 @@ namespace VRC_OSC_AudioEars
             Helpers.MainWindow = this;
             InitializeComponent();
             AudioReactionControl.Start();
+            AudioReactionControl.SetUpAudio();
         }
 
         private async void Window_Initialized(object sender, EventArgs e)
@@ -54,60 +55,18 @@ namespace VRC_OSC_AudioEars
             }
         }
 
-        private void settingsButton_Click(object sender, RoutedEventArgs e)
-        {
-            Transitioner.SelectedIndex = 1;
-        }
+        private void settingsButton_Click(object sender, RoutedEventArgs e) => Transitioner.SelectedIndex = 1;
 
-        private void HomeButton_Click(object sender, RoutedEventArgs e)
-        {
-            Transitioner.SelectedIndex = 0;
-        }
+        private void HomeButton_Click(object sender, RoutedEventArgs e) => Transitioner.SelectedIndex = 0;
 
-        private void aboutButton_Click(object sender, RoutedEventArgs e)
-        {
-            Transitioner.SelectedIndex = 2;
-        }
+        private void aboutButton_Click(object sender, RoutedEventArgs e) => Transitioner.SelectedIndex = 2;
 
-        private void DeviceName_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs? e)
-        {
-            if (DeviceName is { SelectedItem: { } })
-            {
-                string? deviceName = DeviceName.SelectedItem.ToString();
-                AudioReactionControl.SetUpAudio(deviceName);
-            }
-        }
+        private void CheckBox_Checked(object sender, RoutedEventArgs e) => AudioReactionControl.Enable();
 
-        private void DeviceName_Initialized(object sender, EventArgs e)
-        {
-            AudioReactionControl.UpdateUiDeviceList();
-            AudioReactionControl.UpdateDefaultDeviceUI();
-            if (DeviceName != null)
-            {
-                DeviceName.InvalidateVisual();
-                DeviceName.UpdateLayout();
-            }
-        }
+        private async void GithubButtonClick(object sender, RoutedEventArgs e) => await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/Codel1417/VRC-OSC-Audio-Reaction"));
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            AudioReactionControl.Enable();
-            DeviceName_SelectionChanged(sender, null);
-        }
+        private void ToggleButton_OnUnchecked(object sender, RoutedEventArgs e) => AudioReactionControl.Disable();
 
-        private async void GithubButtonClick(object sender, RoutedEventArgs e)
-        {
-            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/Codel1417/VRC-OSC-Audio-Reaction"));
-        }
-
-        private void ToggleButton_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            AudioReactionControl.Disable();
-        }
-
-        private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            AudioReactionControl.UpdateGain((float) e.NewValue);
-        }
+        private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => AudioReactionControl.UpdateGain((float) e.NewValue);
     }
 }

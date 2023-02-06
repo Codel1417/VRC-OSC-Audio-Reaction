@@ -72,11 +72,6 @@
                                             Maximum="3" RenderTransformOrigin="0.5,0.5" LargeChange="0.5"
                                             TickFrequency="0.25" AutoToolTipPrecision="1" IsSnapToTickEnabled="True" ValueChanged="RangeBase_OnValueChanged"/>
                                 </StackPanel>
-                                <ComboBox Style="{DynamicResource MaterialDesignComboBox}" Name="DeviceName"
-                                          SelectionChanged="DeviceName_SelectionChanged"
-                                          Initialized="DeviceName_Initialized" Margin="0,0,0,5">
-                                    Device Name
-                                </ComboBox>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch"
                                             HorizontalAlignment="Stretch">
                                     <TextBlock Style="{DynamicResource MaterialDesignBody1TextBlock}"
